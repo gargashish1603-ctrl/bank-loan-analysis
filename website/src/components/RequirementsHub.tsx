@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
-import { FileText, CheckCircle2, User, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import {
   BUSINESS_REQUIREMENTS,
   FUNCTIONAL_REQUIREMENTS,
-  USER_STORIES_DATA,
-  Requirement,
-  UserStory
+  USER_STORIES_DATA
 } from '../data/baData';
+import type { Requirement } from '../data/baData';
 
 export const RequirementsHub: React.FC = () => {
   const [reqTab, setReqTab] = useState<'br' | 'fr' | 'nfr' | 'stories'>('br');
-  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const nfrData: Requirement[] = [
     {

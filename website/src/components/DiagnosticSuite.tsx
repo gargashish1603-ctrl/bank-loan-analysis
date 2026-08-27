@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AlertCircle, Search, HelpCircle, ChevronDown, ChevronUp, Layers, CheckCircle2 } from 'lucide-react';
-import { BOTTLENECKS, FIVE_WHYS_DATA, FISHBONE_DATA, Bottleneck, FiveWhyItem } from '../data/baData';
+import { Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { BOTTLENECKS, FIVE_WHYS_DATA, FISHBONE_DATA } from '../data/baData';
 
 export const DiagnosticSuite: React.FC = () => {
   const [activeDiagnosticTab, setActiveDiagnosticTab] = useState<'5whys' | 'bottlenecks' | 'fishbone'>('5whys');

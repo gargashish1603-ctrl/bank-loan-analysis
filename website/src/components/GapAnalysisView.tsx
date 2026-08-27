@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Columns, Filter, CheckCircle2, ArrowRight } from 'lucide-react';
-import { GAP_ANALYSIS_DATA, GapItem } from '../data/baData';
+import { Columns } from 'lucide-react';
+import { GAP_ANALYSIS_DATA } from '../data/baData';
 
 export const GapAnalysisView: React.FC = () => {
   const [selectedPriority, setSelectedPriority] = useState<string>('All');

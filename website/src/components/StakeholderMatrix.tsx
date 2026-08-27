@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Users, Filter, Info, Shield, Check } from 'lucide-react';
-import { STAKEHOLDERS, Stakeholder } from '../data/baData';
+import { Users } from 'lucide-react';
+import { STAKEHOLDERS } from '../data/baData';
+import type { Stakeholder } from '../data/baData';
 
 export const StakeholderMatrix: React.FC = () => {
   const [selectedQuadrant, setSelectedQuadrant] = useState<string>('All');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Scale, ShieldCheck, Filter } from 'lucide-react';
-import { BUSINESS_RULES, BusinessRule } from '../data/baData';
+import { Scale } from 'lucide-react';
+import { BUSINESS_RULES } from '../data/baData';
 
 export const BusinessRulesView: React.FC = () => {
   const [selectedCat, setSelectedCat] = useState<string>('All');

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Check, X, Layers, AlertCircle, TrendingDown, Users, PhoneCall, FileText } from 'lucide-react';
-import { BASELINE_METRICS } from '../data/baData';
+import { Check, X, Layers, AlertCircle } from 'lucide-react';
 
 export const BusinessContext: React.FC = () => {
   return (

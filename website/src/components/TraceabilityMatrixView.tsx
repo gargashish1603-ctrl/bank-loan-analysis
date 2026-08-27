@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Network, Search, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
-import { TRACEABILITY_MATRIX, TraceabilityRow } from '../data/baData';
+import { Network } from 'lucide-react';
+import { TRACEABILITY_MATRIX } from '../data/baData';
 
 export const TraceabilityMatrixView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');

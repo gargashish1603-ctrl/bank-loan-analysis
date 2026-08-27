@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, CheckCircle2, TrendingUp, ShieldCheck, ArrowRight, BookOpen } from 'lucide-react';
+import { Award, TrendingUp, BookOpen } from 'lucide-react';
 
 export const ExecutiveRecommendation: React.FC = () => {
   const baCompetencies = [

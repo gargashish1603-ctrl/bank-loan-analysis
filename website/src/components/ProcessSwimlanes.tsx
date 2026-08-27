@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GitBranch, Clock, AlertTriangle, CheckCircle2, ArrowRight, Zap, RefreshCw, FileCheck } from 'lucide-react';
+import { GitBranch, AlertTriangle, Zap } from 'lucide-react';
 
 export const ProcessSwimlanes: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'as-is' | 'to-be'>('to-be');

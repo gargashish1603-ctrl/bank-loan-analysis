@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Calendar, ShieldAlert, Users, Layers, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { ROADMAP_PHASES, RISKS_DATA, RiskItem } from '../data/baData';
+import { Calendar } from 'lucide-react';
+import { ROADMAP_PHASES, RISKS_DATA } from '../data/baData';
 
 export const RoadmapAndRisks: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<'roadmap' | 'change' | 'risks'>('roadmap');
