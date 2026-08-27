@@ -1,4 +1,4 @@
-def get_primes(limit: int) -> list[int]:
+#def get_primes(limit: int) -> list[int]:
     """Return a list of prime numbers up to `limit` using the Sieve of Eratosthenes."""
     if limit < 2:
         return []
