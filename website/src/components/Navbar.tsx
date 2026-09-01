@@ -1,4 +1,5 @@
 import React from 'react';
+import { Github, Globe } from 'lucide-react';
 
 interface NavbarProps {
   activeSection: string;
@@ -48,16 +49,24 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection 
             </div>
           </div>
 
-          {/* Role Badge */}
-          <div className="hidden lg:flex items-center gap-4 text-xs">
-            <div className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 flex items-center gap-1.5">
-              <span className="text-slate-400">Role:</span>
-              <span className="font-medium text-white">Business Analyst</span>
+          {/* Role Badge & Quick Links */}
+          <div className="flex items-center gap-3 text-xs">
+            <div className="hidden lg:flex items-center gap-2">
+              <div className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 flex items-center gap-1.5">
+                <span className="text-slate-400">Role:</span>
+                <span className="font-medium text-white">Business Analyst</span>
+              </div>
             </div>
-            <div className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 flex items-center gap-1.5">
-              <span className="text-slate-400">Focus:</span>
-              <span className="font-medium text-emerald-400">Process Redesign</span>
-            </div>
+
+            <a
+              href="https://github.com/gargashish1603-ctrl/bank-loan-analysis"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Github className="w-3.5 h-3.5 text-slate-300" />
+              <span className="hidden sm:inline">GitHub Repo</span>
+            </a>
           </div>
         </div>
 
@@ -69,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection 
               onClick={() => setActiveSection(item.id)}
               className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap transition-colors flex items-center gap-1 ${
                 activeSection === item.id
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ? 'bg-blue-600 text-white shadow-sm font-bold'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
               }`}
             >

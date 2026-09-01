@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart3, Sliders } from 'lucide-react';
+import { BarChart3, Sliders, Zap } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
 import { KPI_ITEMS } from '../data/baData';
 
@@ -8,6 +8,24 @@ export const KpiDashboardSimulator: React.FC = () => {
   const [monthlyVolume, setMonthlyVolume] = useState<number>(10000);
   const [stpRate, setStpRate] = useState<number>(38);
   const [reworkReduction, setReworkReduction] = useState<number>(77);
+  const [activePreset, setActivePreset] = useState<'target' | 'baseline' | 'aggressive'>('target');
+
+  const applyPreset = (preset: 'baseline' | 'target' | 'aggressive') => {
+    setActivePreset(preset);
+    if (preset === 'baseline') {
+      setMonthlyVolume(10000);
+      setStpRate(0);
+      setReworkReduction(0);
+    } else if (preset === 'target') {
+      setMonthlyVolume(10000);
+      setStpRate(38);
+      setReworkReduction(77);
+    } else if (preset === 'aggressive') {
+      setMonthlyVolume(20000);
+      setStpRate(50);
+      setReworkReduction(85);
+    }
+  };
 
   // Derived Scenario Metrics
   const baselineReworkFiles = Math.round(monthlyVolume * 0.35);
@@ -15,7 +33,6 @@ export const KpiDashboardSimulator: React.FC = () => {
   const reworkSaved = baselineReworkFiles - projectedReworkFiles;
 
   const projectedStpLoans = Math.round(monthlyVolume * (stpRate / 100));
-
   const hoursSavedPerMonth = Math.round(monthlyVolume * (40.0 - 14.4));
 
   // Chart Comparison Data
@@ -45,7 +62,7 @@ export const KpiDashboardSimulator: React.FC = () => {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
         {KPI_ITEMS.map((kpi) => (
-          <div key={kpi.id} className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div key={kpi.id} className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{kpi.category}</span>
@@ -97,14 +114,40 @@ export const KpiDashboardSimulator: React.FC = () => {
 
       {/* Interactive Scenario Simulator */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 rounded-xl p-6 text-white border border-slate-800 shadow-xl space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-blue-400" />
             <h3 className="text-base font-bold text-white">Interactive Operational Scenario Simulator</h3>
           </div>
-          <span className="text-[10px] text-amber-300 bg-amber-400/10 px-2.5 py-1 rounded border border-amber-400/20">
-            Illustrative Scenario Model
-          </span>
+          
+          {/* Preset Buttons */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-slate-400 text-[11px] mr-1 hidden md:inline">Quick Presets:</span>
+            <button
+              onClick={() => applyPreset('baseline')}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
+                activePreset === 'baseline' ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Baseline AS-IS
+            </button>
+            <button
+              onClick={() => applyPreset('target')}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
+                activePreset === 'target' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Target 2026 Plan
+            </button>
+            <button
+              onClick={() => applyPreset('aggressive')}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
+                activePreset === 'aggressive' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Scale Stress-Test
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
@@ -122,7 +165,10 @@ export const KpiDashboardSimulator: React.FC = () => {
                 max="25000"
                 step="1000"
                 value={monthlyVolume}
-                onChange={(e) => setMonthlyVolume(Number(e.target.value))}
+                onChange={(e) => {
+                  setMonthlyVolume(Number(e.target.value));
+                  setActivePreset('target');
+                }}
                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
               <div className="flex justify-between text-[10px] text-slate-500 mt-1">
@@ -140,15 +186,18 @@ export const KpiDashboardSimulator: React.FC = () => {
               </div>
               <input
                 type="range"
-                min="10"
+                min="0"
                 max="60"
                 step="2"
                 value={stpRate}
-                onChange={(e) => setStpRate(Number(e.target.value))}
+                onChange={(e) => {
+                  setStpRate(Number(e.target.value));
+                  setActivePreset('target');
+                }}
                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
               />
               <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                <span>10% (Conservative)</span>
+                <span>0% (AS-IS)</span>
                 <span>38% (Target)</span>
                 <span>60% (Aggressive)</span>
               </div>
@@ -162,15 +211,18 @@ export const KpiDashboardSimulator: React.FC = () => {
               </div>
               <input
                 type="range"
-                min="30"
+                min="0"
                 max="90"
                 step="5"
                 value={reworkReduction}
-                onChange={(e) => setReworkReduction(Number(e.target.value))}
+                onChange={(e) => {
+                  setReworkReduction(Number(e.target.value));
+                  setActivePreset('target');
+                }}
                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
               />
               <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                <span>30%</span>
+                <span>0% (No Pre-Check)</span>
                 <span>77% (Target: 35%→8%)</span>
                 <span>90%</span>
               </div>
