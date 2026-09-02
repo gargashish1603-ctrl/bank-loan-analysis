@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart3, Sliders, Zap } from 'lucide-react';
+import { BarChart3, Sliders } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
 import { KPI_ITEMS } from '../data/baData';
 
