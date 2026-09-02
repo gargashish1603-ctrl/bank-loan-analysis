@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowDown, Clock, RefreshCw, ShieldAlert, Sparkles } from 'lucide-react';
 
 interface HeroExecutiveProps {
@@ -6,10 +6,42 @@ interface HeroExecutiveProps {
 }
 
 export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) => {
+  // Animated Number Counters on Hero Mount
+  const [tat, setTat] = useState(0);
+  const [rework, setRework] = useState(0);
+  const [sla, setSla] = useState(0);
+
+  useEffect(() => {
+    const duration = 1200; // ms
+    const steps = 30;
+    const intervalTime = duration / steps;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      // Ease out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+
+      setTat(Number((5.0 * ease).toFixed(1)));
+      setRework(Math.round(35 * ease));
+      setSla(Math.round(14 * ease));
+
+      if (step >= steps) {
+        clearInterval(timer);
+        setTat(5.0);
+        setRework(35);
+        setSla(14);
+      }
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section id="executive-summary" className="bg-gradient-to-b from-slate-900 via-slate-850 to-slate-900 text-white py-14 px-4 sm:px-6 lg:px-8 border-b border-slate-800 relative overflow-hidden">
       {/* Subtle Background Geometric Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
       <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -55,7 +87,7 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 onClick={onExploreClick}
-                className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center gap-2 shadow transition-all"
+                className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center gap-2 shadow transition-all hover:scale-105 active:scale-95"
               >
                 <span>Explore Full Case Study</span>
                 <ArrowDown className="w-3.5 h-3.5" />
@@ -66,14 +98,14 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
                   const el = document.getElementById('as-is-process');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition-colors"
+                className="px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition-colors hover:border-slate-600"
               >
                 Inspect AS-IS BPMN Map
               </button>
             </div>
           </div>
 
-          {/* 3 Prominent Baseline KPI Cards */}
+          {/* 3 Prominent Baseline KPI Cards with Animated Counter */}
           <div className="lg:col-span-4 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-700 pb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Baseline Performance</span>
@@ -81,13 +113,13 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
             </div>
 
             {/* Card 1: Turnaround Time */}
-            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-blue-500/50 hover:bg-slate-800">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-blue-500/15 text-blue-400">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-white">5.0 days</div>
+                  <div className="text-2xl font-extrabold text-white font-mono">{tat.toFixed(1)} days</div>
                   <div className="text-[11px] text-slate-400 font-medium">Average Turnaround Time</div>
                 </div>
               </div>
@@ -98,13 +130,13 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
             </div>
 
             {/* Card 2: Document Rework */}
-            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-amber-500/50 hover:bg-slate-800">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-amber-500/15 text-amber-400">
                   <RefreshCw className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-white">35%</div>
+                  <div className="text-2xl font-extrabold text-white font-mono">{rework}%</div>
                   <div className="text-[11px] text-slate-400 font-medium">Document Rework</div>
                 </div>
               </div>
@@ -115,13 +147,13 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
             </div>
 
             {/* Card 3: SLA Breach Rate */}
-            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-red-500/50 hover:bg-slate-800">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-red-500/15 text-red-400">
                   <ShieldAlert className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-white">14%</div>
+                  <div className="text-2xl font-extrabold text-white font-mono">{sla}%</div>
                   <div className="text-[11px] text-slate-400 font-medium">SLA Breach Rate</div>
                 </div>
               </div>
