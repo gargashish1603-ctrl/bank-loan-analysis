@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowDown, Clock, RefreshCw, ShieldAlert, Sparkles } from 'lucide-react';
+import { ArrowDown, Clock, RefreshCw, ShieldAlert, Sparkles, Layers, FileText } from 'lucide-react';
 
 interface HeroExecutiveProps {
   onExploreClick: () => void;
@@ -10,6 +10,8 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
   const [tat, setTat] = useState(0);
   const [rework, setRework] = useState(0);
   const [sla, setSla] = useState(0);
+  const [additionalInfo, setAdditionalInfo] = useState(0);
+  const [handoffDelay, setHandoffDelay] = useState(0);
 
   useEffect(() => {
     const duration = 1200; // ms
@@ -20,18 +22,21 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
     const timer = setInterval(() => {
       step++;
       const progress = step / steps;
-      // Ease out cubic
       const ease = 1 - Math.pow(1 - progress, 3);
 
       setTat(Number((5.0 * ease).toFixed(1)));
       setRework(Math.round(35 * ease));
       setSla(Math.round(14 * ease));
+      setAdditionalInfo(Math.round(18 * ease));
+      setHandoffDelay(Math.round(22 * ease));
 
       if (step >= steps) {
         clearInterval(timer);
         setTat(5.0);
         setRework(35);
         setSla(14);
+        setAdditionalInfo(18);
+        setHandoffDelay(22);
       }
     }, intervalTime);
 
@@ -40,8 +45,8 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
 
   return (
     <section id="executive-summary" className="bg-gradient-to-b from-slate-900 via-slate-850 to-slate-900 text-white py-14 px-4 sm:px-6 lg:px-8 border-b border-slate-800 relative overflow-hidden">
-      {/* Subtle Background Geometric Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      {/* Subtle Background Glow */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -51,9 +56,9 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
             BANKING PROCESS TRANSFORMATION
           </span>
           <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-            Business Analyst Case Study
+            Role: Business Analyst
           </span>
-          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700 hidden sm:inline">
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
             NovaBank — Fictional Enterprise Bank
           </span>
         </div>
@@ -68,18 +73,22 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
               </span>
             </h1>
 
-            <p className="mt-4 text-base sm:text-lg text-slate-300 font-medium leading-relaxed max-w-3xl">
+            <p className="mt-2 text-sm sm:text-base font-semibold text-blue-300 tracking-wide">
+              AS-IS Process Analysis, Gap Assessment & TO-BE Process Design
+            </p>
+
+            <p className="mt-3 text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
               A Business Analyst case study analyzing the AS-IS loan origination process, identifying operational bottlenecks and root causes, and designing an automation-first TO-BE process.
             </p>
 
             {/* Core BA Problem & Scope Synthesis */}
-            <div className="mt-6 p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 shadow-lg">
-              <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">
+            <div className="mt-5 p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 shadow-lg">
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-1.5">
                 <Sparkles className="w-4 h-4 text-blue-400" />
                 <span>Executive Case Synthesis</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                NovaBank personal loan processing required <strong className="text-white font-semibold">5.0 business days</strong> with <strong className="text-amber-300 font-semibold">35% document rework</strong> and <strong className="text-red-300 font-semibold">14% SLA breaches</strong> across 10,000 monthly applications. Through root-cause diagnostics, this project re-architected the journey into a dual-track operating model: <strong className="text-emerald-400 font-semibold">38% Straight-Through Processing (STP)</strong> for low-risk applicants and an <strong className="text-sky-300 font-semibold">Exception Underwriter Workbench</strong> for complex reviews.
+                NovaBank personal loan processing required <strong className="text-white font-semibold">5.0 business days</strong> with <strong className="text-amber-300 font-semibold">35% document rework</strong>, <strong className="text-amber-300 font-semibold">18% additional-info requests</strong>, <strong className="text-amber-300 font-semibold">22% handoff drag</strong>, and <strong className="text-red-300 font-semibold">14% SLA breaches</strong> across 10,000 monthly applications. Through root-cause diagnostics, this project re-architected the journey into a dual-track operating model: <strong className="text-emerald-400 font-semibold">38% Straight-Through Processing (STP)</strong> for low-risk applicants and an <strong className="text-sky-300 font-semibold">Exception Underwriter Workbench</strong> for complex reviews.
               </p>
             </div>
 
@@ -105,61 +114,95 @@ export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) 
             </div>
           </div>
 
-          {/* 3 Prominent Baseline KPI Cards with Animated Counter */}
-          <div className="lg:col-span-4 space-y-3">
+          {/* Prominent Baseline KPI Cards with Animated Counter */}
+          <div className="lg:col-span-4 space-y-2.5">
             <div className="flex items-center justify-between border-b border-slate-700 pb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Baseline Performance</span>
               <span className="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">Monthly: 10,000 Apps</span>
             </div>
 
             {/* Card 1: Turnaround Time */}
-            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-blue-500/50 hover:bg-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/15 text-blue-400">
-                  <Clock className="w-5 h-5" />
+            <div className="p-3 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-blue-500/50">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-blue-500/15 text-blue-400">
+                  <Clock className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-white font-mono">{tat.toFixed(1)} days</div>
-                  <div className="text-[11px] text-slate-400 font-medium">Average Turnaround Time</div>
+                  <div className="text-xl font-extrabold text-white font-mono">{tat.toFixed(1)} days</div>
+                  <div className="text-[10px] text-slate-400 font-medium">Average Turnaround Time</div>
                 </div>
               </div>
               <div className="text-right">
                 <span className="text-xs font-bold text-emerald-400 block">→ 1.8 days</span>
-                <span className="text-[10px] text-slate-400">-64% Target</span>
+                <span className="text-[9px] text-slate-400">-64% Target</span>
               </div>
             </div>
 
             {/* Card 2: Document Rework */}
-            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-amber-500/50 hover:bg-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-amber-500/15 text-amber-400">
-                  <RefreshCw className="w-5 h-5" />
+            <div className="p-3 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-amber-500/50">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400">
+                  <RefreshCw className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-white font-mono">{rework}%</div>
-                  <div className="text-[11px] text-slate-400 font-medium">Document Rework</div>
+                  <div className="text-xl font-extrabold text-white font-mono">{rework}%</div>
+                  <div className="text-[10px] text-slate-400 font-medium">Document Rework</div>
                 </div>
               </div>
               <div className="text-right">
                 <span className="text-xs font-bold text-emerald-400 block">→ 8%</span>
-                <span className="text-[10px] text-slate-400">-77% Target</span>
+                <span className="text-[9px] text-slate-400">-77% Target</span>
               </div>
             </div>
 
-            {/* Card 3: SLA Breach Rate */}
-            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-red-500/50 hover:bg-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-red-500/15 text-red-400">
-                  <ShieldAlert className="w-5 h-5" />
+            {/* Card 3: Additional Info Requests */}
+            <div className="p-3 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-amber-500/50">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400">
+                  <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-white font-mono">{sla}%</div>
-                  <div className="text-[11px] text-slate-400 font-medium">SLA Breach Rate</div>
+                  <div className="text-xl font-extrabold text-white font-mono">{additionalInfo}%</div>
+                  <div className="text-[10px] text-slate-400 font-medium">Additional Info Requests</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-bold text-emerald-400 block">→ 4%</span>
+                <span className="text-[9px] text-slate-400">-77% Target</span>
+              </div>
+            </div>
+
+            {/* Card 4: Manual Handoff Delays */}
+            <div className="p-3 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-purple-500/50">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-purple-500/15 text-purple-400">
+                  <Layers className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xl font-extrabold text-white font-mono">{handoffDelay}%</div>
+                  <div className="text-[10px] text-slate-400 font-medium">Manual Handoff Delays</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-bold text-emerald-400 block">→ 4%</span>
+                <span className="text-[9px] text-slate-400">-81% Target</span>
+              </div>
+            </div>
+
+            {/* Card 5: SLA Breach Rate */}
+            <div className="p-3 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between transition-all hover:border-red-500/50">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-red-500/15 text-red-400">
+                  <ShieldAlert className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xl font-extrabold text-white font-mono">{sla}%</div>
+                  <div className="text-[10px] text-slate-400 font-medium">SLA Breach Rate</div>
                 </div>
               </div>
               <div className="text-right">
                 <span className="text-xs font-bold text-emerald-400 block">→ 5%</span>
-                <span className="text-[10px] text-slate-400">-64% Target</span>
+                <span className="text-[9px] text-slate-400">-64% Target</span>
               </div>
             </div>
 
