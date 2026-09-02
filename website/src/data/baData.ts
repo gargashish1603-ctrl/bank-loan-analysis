@@ -14,6 +14,24 @@ export interface Stakeholder {
   engagement: string;
 }
 
+export interface ProcessNodeDetail {
+  id: string;
+  name: string;
+  lane: string;
+  owner: string;
+  stage: string;
+  input: string;
+  output: string;
+  painPoint: string;
+  observedIssue: string;
+  duration: string;
+  isBottleneck?: boolean;
+  isRework?: boolean;
+  isSTP?: boolean;
+  isException?: boolean;
+  automationType?: string;
+}
+
 export interface Bottleneck {
   id: string;
   title: string;
@@ -56,6 +74,8 @@ export interface Requirement {
   rationale: string;
   priority: 'Must Have' | 'Should Have' | 'Could Have' | 'Won\'t Have';
   relatedProblem: string;
+  relatedProcessStep?: string;
+  businessValue?: string;
 }
 
 export interface BusinessRule {
@@ -81,13 +101,19 @@ export interface UserStory {
   }[];
 }
 
-export interface TraceabilityRow {
-  problemId: string;
+export interface TraceabilityChain {
+  id: string;
+  title: string;
   problem: string;
   rootCause: string;
+  gap: string;
   brId: string;
+  brTitle: string;
   frId: string;
+  frTitle: string;
   usId: string;
+  usPersona: string;
+  acceptanceCriteria: string;
   solution: string;
   kpi: string;
   targetImpact: string;
@@ -97,10 +123,14 @@ export interface KPIItem {
   id: string;
   category: 'Operational' | 'Quality' | 'Customer';
   name: string;
+  definition: string;
   formula: string;
   baseline: string;
   target: string;
   change: string;
+  proposedSource: string;
+  owner: string;
+  frequency: string;
   trend: 'positive' | 'negative';
   rationale: string;
 }
@@ -115,6 +145,17 @@ export interface RiskItem {
   severity: 'Critical' | 'High' | 'Medium' | 'Low';
   mitigation: string;
   owner: string;
+}
+
+export interface RoadmapPhase {
+  phaseNumber: string;
+  title: string;
+  duration: string;
+  focus: string;
+  objectives: string[];
+  keyDeliverables: string[];
+  dependencies: string[];
+  successMeasures: string[];
 }
 
 export const BASELINE_METRICS = {
@@ -137,6 +178,9 @@ export const BASELINE_METRICS = {
   csatTarget: 88,
 };
 
+// ---------------------------------------------------------
+// 8 Core Stakeholders & 2x2 Matrix
+// ---------------------------------------------------------
 export const STAKEHOLDERS: Stakeholder[] = [
   {
     id: 'STK-01',
@@ -154,31 +198,31 @@ export const STAKEHOLDERS: Stakeholder[] = [
     id: 'STK-02',
     name: 'Relationship Manager',
     role: 'Sales & Sourcing',
-    orgUnit: 'Retail Sales',
+    orgUnit: 'Retail Sales Network',
     interest: 'High',
     influence: 'Medium',
     quadrant: 'Keep Informed',
     responsibilities: 'Sources leads, guides walk-in clients, tracks monthly origination conversion quotas.',
     painPoints: 'Spends 40% of time chasing missing customer paperwork rather than advisory selling.',
-    engagement: 'Mobile tablet pre-qualification estimator, instant eligibility checks.'
+    engagement: 'Mobile tablet pre-qualification estimator, instant eligibility checks, lead tracking dashboard.'
   },
   {
     id: 'STK-03',
     name: 'Branch Operations Officer',
-    role: 'Branch Intake',
+    role: 'Branch Intake Staff',
     orgUnit: 'Retail Branch Network',
     interest: 'Medium',
     influence: 'High',
     quadrant: 'Keep Satisfied',
     responsibilities: 'Receives walk-in physical documents, scans paperwork, re-keys applicant data into CRM.',
-    painPoints: 'Repetitive typing across 4 screens, handling frustrated walk-in applicants.',
-    engagement: 'High-speed barcode document scanners, assisted digital intake tools.'
+    painPoints: 'Repetitive manual typing across 4 screens, handling frustrated walk-in applicants.',
+    engagement: 'High-speed barcode document scanners, assisted digital intake tablet tools.'
   },
   {
     id: 'STK-04',
     name: 'Loan Operations Specialist',
     role: 'Central Backoffice',
-    orgUnit: 'Central Operations',
+    orgUnit: 'Central Lending Operations',
     interest: 'High',
     influence: 'High',
     quadrant: 'Manage Closely',
@@ -190,652 +234,734 @@ export const STAKEHOLDERS: Stakeholder[] = [
     id: 'STK-05',
     name: 'KYC / AML Analyst',
     role: 'Compliance Verification',
-    orgUnit: 'Compliance Operations',
+    orgUnit: 'Financial Crime & Compliance',
     interest: 'High',
     influence: 'High',
     quadrant: 'Manage Closely',
     responsibilities: 'Verifies national identity proofs, performs PEP and sanctions watchlist screening.',
-    painPoints: 'Manual copy-pasting of IDs into external government portals; high queue dwell times.',
+    painPoints: 'Manual copy-pasting of IDs into external government portals; 4h verification latency.',
     engagement: 'Automated REST API integrations with National ID Registry and real-time AML screening.'
   },
   {
     id: 'STK-06',
     name: 'Credit Risk Analyst',
     role: 'Risk Assessment',
-    orgUnit: 'Credit Risk Directorate',
+    orgUnit: 'Credit Risk Division',
     interest: 'High',
     influence: 'High',
     quadrant: 'Manage Closely',
-    responsibilities: 'Pulls bureau reports, verifies Debt-to-Income (DTI), assesses borrower repayment capacity.',
-    painPoints: 'Manually calculating ratios on Excel sheets from un-indexed PDF bank statements.',
-    engagement: 'Direct credit bureau API ingestion and algorithmic DTI/FOIR calculation engine.'
+    responsibilities: 'Calculates Debt-to-Income (DTI), analyzes bureau reports, sets risk-based pricing.',
+    painPoints: 'Manually calculating ratios on Excel sheets from un-indexed PDF statements; 11.5% transcription errors.',
+    engagement: 'Automated credit bureau API ingestion and algorithmic DTI calculation engine.'
   },
   {
     id: 'STK-07',
     name: 'Senior Underwriter',
     role: 'Credit Authority',
-    orgUnit: 'Credit Approval Desk',
+    orgUnit: 'Credit Underwriting Desk',
     interest: 'High',
     influence: 'High',
     quadrant: 'Manage Closely',
-    responsibilities: 'Final approval/decline sign-off, policy exception approvals, risk mitigation evaluation.',
+    responsibilities: 'Reviews credit policy exceptions, approves loans within Delegated Lending Authority (DLA).',
     painPoints: 'Mundane low-risk files clutter the queue, creating 9.5 hours of idle queue wait time.',
-    engagement: 'Straight-Through Processing (STP) for low-risk Tier 1; unified Underwriter Workbench for exceptions.'
+    engagement: 'Unified Underwriter Workbench with pre-calculated ratios and automated Tier 1 STP.'
   },
   {
     id: 'STK-08',
     name: 'Disbursement Officer',
     role: 'Funds Release',
-    orgUnit: 'Payment Operations',
+    orgUnit: 'Payments & Settlement',
     interest: 'Medium',
     influence: 'High',
     quadrant: 'Keep Satisfied',
-    responsibilities: 'Validates signed contracts and account mandates; triggers payments in Core Banking.',
-    painPoints: 'Waiting for paper contracts; manual keying of account numbers into payment batches.',
-    engagement: 'Automated e-Sign verification and direct API payment release to Core Banking.'
-  },
-  {
-    id: 'STK-09',
-    name: 'Branch Manager',
-    role: 'Branch Oversight',
-    orgUnit: 'Retail Distribution',
-    interest: 'Medium',
-    influence: 'Medium',
-    quadrant: 'Keep Informed',
-    responsibilities: 'Oversees branch sales targets, monitors customer NPS and SLA compliance.',
-    painPoints: '14% SLA breaches reflecting poorly on branch performance; customer complaints.',
-    engagement: 'Executive dashboard showing real-time pipeline, queue depth, and SLA alert countdowns.'
-  },
-  {
-    id: 'STK-10',
-    name: 'Enterprise IT Architect',
-    role: 'Technology Systems',
-    orgUnit: 'Information Technology',
-    interest: 'Medium',
-    influence: 'Medium',
-    quadrant: 'Keep Satisfied',
-    responsibilities: 'Maintains core banking stability, manages APIs, oversees security access controls.',
-    painPoints: 'Supporting 4 disconnected legacy architectures without modern REST microservices.',
-    engagement: 'API Gateway middleware, event-driven architecture, and secure role-based access.'
-  },
-  {
-    id: 'STK-11',
-    name: 'Head of Regulatory Compliance',
-    role: 'Risk Directorate',
-    orgUnit: 'Governance & Compliance',
-    interest: 'High',
-    influence: 'High',
-    quadrant: 'Manage Closely',
-    responsibilities: 'Ensures zero violation of Fair Lending, KYC/AML mandates, and consumer privacy laws.',
-    painPoints: 'Risk of non-compliance if automated systems bypass audit trails or regulatory checks.',
-    engagement: 'Mandatory compliance gates, immutable 7-year audit logging, algorithmic fairness audits.'
+    responsibilities: 'Executes loan agreements, verifies disbursement conditions, initiates Core Banking payout.',
+    painPoints: 'Waiting for physical wet-ink contracts; manual batch payment keying resulting in 24h lag.',
+    engagement: 'Mobile OTP digital e-Signature and automated Core Banking API payment rails.'
   }
 ];
 
-export const BOTTLENECKS: Bottleneck[] = [
+// ---------------------------------------------------------
+// AS-IS Process BPMN Swimlane Nodes
+// ---------------------------------------------------------
+export const AS_IS_PROCESS_NODES: ProcessNodeDetail[] = [
   {
-    id: 'B1',
-    title: 'Unassisted Manual Document Verification',
-    stage: 'Stage 2: Document Ingestion',
-    problem: 'Operations staff manually inspect each uploaded PDF/image. 35% of submissions contain illegible or invalid files.',
-    rootCause: 'Lack of dynamic document checklists and client-side resolution/format pre-validation at upload.',
-    idleLatency: '+7.3 Hours',
-    failureRate: '35.0% Rework',
-    severity: 5,
-    proposedSolution: 'Automated Document Pre-Validation Engine (DPI ≥ 300) and profile-driven dynamic checklist.',
-    relatedReq: 'FR-02, FR-04'
+    id: 'ASIS-01',
+    name: 'Application Intake & Static Capture',
+    lane: 'Customer / RM',
+    owner: 'Retail Applicant / Relationship Manager',
+    stage: '1. Application',
+    input: 'Applicant generic form fields',
+    output: 'Unvalidated digital or paper application',
+    painPoint: 'Static form lacks dynamic guidance; 18% missing fields',
+    observedIssue: 'Customer submits incomplete profile; RM manually re-keys into CRM',
+    duration: '1.5 Hours'
   },
   {
-    id: 'B2',
-    title: 'Incomplete Applications & Missing Form Data',
-    stage: 'Stage 1: Application Capture',
-    problem: 'Intake forms permit missing contact numbers, ambiguous expenses, and incomplete employment tenure.',
-    rootCause: 'Absence of real-time field-level validation and mandatory dependency rules on digital forms.',
-    idleLatency: '+5.2 Hours',
-    failureRate: '18.0% Hold Rate',
-    severity: 4,
-    proposedSolution: 'Intelligent digital form with real-time field validation and address auto-lookup.',
-    relatedReq: 'FR-01'
+    id: 'ASIS-02',
+    name: 'Physical Paper & PDF Upload',
+    lane: 'Branch Operations',
+    owner: 'Branch Operations Officer',
+    stage: '2. Doc Collection',
+    input: 'Physical documents / photo uploads',
+    output: 'Unindexed document repository files',
+    painPoint: 'No point-of-upload image resolution checks',
+    observedIssue: 'Blurry, cropped smartphone photos accepted without immediate validation',
+    duration: '2.0 Hours'
   },
   {
-    id: 'B3',
-    title: 'Duplicate Manual Data Re-Keying',
-    stage: 'Stage 1, 2, 4 & 8: System Handoffs',
-    problem: 'Staff manually type identical applicant data across 4 disconnected software platforms (CRM, KYC, LOS, Core).',
-    rootCause: 'Siloed legacy enterprise architecture lacking RESTful API middleware or integration bus.',
-    idleLatency: '+4.0 Hours',
-    failureRate: '11.5% Error Rate',
-    severity: 4,
-    proposedSolution: 'Unified RESTful API microservices data orchestrator layer synchronizing records.',
-    relatedReq: 'FR-08, FR-19'
+    id: 'ASIS-03',
+    name: 'Manual Document Inspection & Rework Loop',
+    lane: 'Loan Operations',
+    owner: 'Central Backoffice Specialist',
+    stage: '3. Doc Validation',
+    input: 'Unindexed document batch',
+    output: 'Deficiency notification email or validated file',
+    painPoint: '35% rework loop; manual email dispatch',
+    observedIssue: 'Applicant takes 26h to respond; rejected file loses queue priority (+48h lag)',
+    duration: '8.5 Hours (+7.3h idle)',
+    isBottleneck: true,
+    isRework: true
   },
   {
-    id: 'B4',
-    title: 'Opaque Status Visibility & Inbound Inquiries',
-    stage: 'End-to-End Origination',
-    problem: 'Applicants have zero progress visibility, generating 3.2 phone calls and emails per active application.',
-    rootCause: 'No customer-facing tracking interface or event-triggered notification service.',
-    idleLatency: '+3.0 Hours (Staff Drag)',
-    failureRate: '3.2 Calls / App',
-    severity: 4,
-    proposedSolution: '24/7 Self-Service Milestone Tracker with automated SMS/Email push notifications.',
-    relatedReq: 'FR-07, FR-20'
+    id: 'ASIS-04',
+    name: 'Manual Government Portal Search',
+    lane: 'KYC / AML',
+    owner: 'Compliance Analyst',
+    stage: '4. KYC Verification',
+    input: 'Scanned ID card copy',
+    output: 'Manual PDF compliance certificate',
+    painPoint: 'Manual copy-pasting of national ID into external portals',
+    observedIssue: 'Disconnected compliance silo creates 4.0h processing delay',
+    duration: '4.0 Hours'
   },
   {
-    id: 'B5',
-    title: 'Undifferentiated FIFO Underwriting Queues',
-    stage: 'Stage 5: Credit Underwriting',
-    problem: 'Standard, low-risk salaried applicants sit in the same queue as complex borderline cases (9.5h wait).',
-    rootCause: 'Absence of an automated credit decision engine to execute Straight-Through Processing (STP).',
-    idleLatency: '+9.5 Hours',
-    failureRate: '0% STP Rate',
-    severity: 5,
-    proposedSolution: 'Automated Credit Decision Engine with STP for Tier 1 low-risk applicants (Score ≥750, DTI ≤35%).',
-    relatedReq: 'FR-13, FR-14'
+    id: 'ASIS-05',
+    name: 'Manual Bureau Pull & Excel DTI Calculation',
+    lane: 'Credit Risk',
+    owner: 'Credit Risk Analyst',
+    stage: '5. Credit Assessment',
+    input: 'Applicant income statements & bureau pull',
+    output: 'Manual Excel DTI assessment sheet',
+    painPoint: 'Manual calculation on spreadsheets; 11.5% copy-paste errors',
+    observedIssue: 'Risk assessment takes 4.5h per application without automated scoring',
+    duration: '4.5 Hours'
   },
   {
-    id: 'B6',
-    title: 'Reactive SLA Tracking & Stagnation',
-    stage: 'Operations Governance',
-    problem: 'Team leads discover delayed applications only after customer complaints or SLA breaches occur.',
-    rootCause: 'Absence of real-time task timer monitoring and automated pre-breach escalation triggers.',
-    idleLatency: '+4.5 Hours',
-    failureRate: '14.0% Breach Rate',
-    severity: 4,
-    proposedSolution: 'Proactive SLA countdown monitors triggering automated amber (50%) and red (75%) alerts.',
-    relatedReq: 'FR-20'
+    id: 'ASIS-06',
+    name: '100% Manual FIFO Underwriting Queue',
+    lane: 'Underwriting',
+    owner: 'Senior Underwriter',
+    stage: '6. Underwriting',
+    input: 'Aggregated credit dossier',
+    output: 'Underwriter credit sanction / decline',
+    painPoint: 'Zero Straight-Through Processing; 9.5h queue dwell time',
+    observedIssue: 'Standard low-risk files sit behind complex edge cases in a single queue',
+    duration: '11.0 Hours (+9.5h idle)',
+    isBottleneck: true
   },
   {
-    id: 'B7',
-    title: 'Physical Paper Contract Signing',
-    stage: 'Stage 7: Agreement & Settlement',
-    problem: 'Customers must travel to a branch to sign physical loan contracts, stalling disbursement by 24–48 hours.',
-    rootCause: 'Reliance on wet-ink signatures and lack of mobile cryptographic e-Signature integration.',
-    idleLatency: '+24.0 Hours',
-    failureRate: '24h Delay',
-    severity: 4,
-    proposedSolution: 'Digital Sanction Letter generation with mobile OTP cryptographic e-Signature gateway.',
-    relatedReq: 'FR-17, FR-18'
+    id: 'ASIS-07',
+    name: 'Branch Physical Wet-Ink Contract Signing',
+    lane: 'Customer / Branch',
+    owner: 'Applicant & Branch Officer',
+    stage: '7. Approval & Agreement',
+    input: 'Printed physical sanction letter',
+    output: 'Signed physical paper loan contract',
+    painPoint: 'Mandatory branch visit for physical wet-ink signing',
+    observedIssue: 'Adds 24 to 48 hours post-approval lag while waiting for applicant appointment',
+    duration: '24.0 Hours'
+  },
+  {
+    id: 'ASIS-08',
+    name: 'Manual Batch Keying to Core Banking',
+    lane: 'Disbursement',
+    owner: 'Disbursement Officer',
+    stage: '8. Disbursement',
+    input: 'Physical signed agreement',
+    output: 'Batch payment file instruction',
+    painPoint: 'Manual re-keying into Core Banking payment files',
+    observedIssue: 'Funds credited 24 hours after signing due to end-of-day batch settlement',
+    duration: '24.0 Hours'
   }
 ];
 
+// ---------------------------------------------------------
+// TO-BE Process BPMN Swimlane Nodes (Dual Track)
+// ---------------------------------------------------------
+export const TO_BE_PROCESS_NODES: ProcessNodeDetail[] = [
+  {
+    id: 'TOBE-01',
+    name: 'Digital Omni-Channel Capture & Pre-Validation',
+    lane: 'Customer / RM',
+    owner: 'Applicant / Assisted Branch Tablet',
+    stage: '1. Digital Intake',
+    input: 'Dynamic applicant profile inputs',
+    output: 'Pre-validated application packet with DPI ≥ 300',
+    painPoint: 'Replaces static forms with dynamic profile-driven checklists',
+    observedIssue: 'Real-time client-side checks eliminate 77% of intake document errors',
+    duration: '< 15 Minutes',
+    automationType: 'Automated Client-Side Validation'
+  },
+  {
+    id: 'TOBE-02',
+    name: 'Automated National ID & AML API Screening',
+    lane: 'KYC / AML',
+    owner: 'Automated Compliance Microservice',
+    stage: '2. Automated KYC',
+    input: 'National ID & biometric hash',
+    output: 'Instant KYC clearance token & AML audit log',
+    painPoint: 'Replaces manual portal lookup with sub-3s REST API calls',
+    observedIssue: '92% of standard applicants verified in <3 seconds; edge flags route to AML analyst',
+    duration: '< 3.0 Seconds',
+    automationType: 'RESTful API Orchestration'
+  },
+  {
+    id: 'TOBE-03',
+    name: 'Bureau Ingestion & Algorithmic DTI Computation',
+    lane: 'Credit Risk Engine',
+    owner: 'Credit Decision Engine',
+    stage: '3. Credit Scoring',
+    input: 'Direct credit bureau file & verified income data',
+    output: 'Algorithmic DTI, FOIR, and Risk Tier score',
+    painPoint: 'Eliminates Excel spreadsheets and manual ratio transcription',
+    observedIssue: 'Consistent mathematical computation in <5 seconds with zero human error',
+    duration: '< 5.0 Seconds',
+    automationType: 'Rule-Based Computation Engine'
+  },
+  {
+    id: 'TOBE-04',
+    name: '★ Track A: Straight-Through-Processing (STP)',
+    lane: 'Credit Decision Engine',
+    owner: 'Automated STP Engine',
+    stage: '4. Decisioning (Track A)',
+    input: 'Tier 1 Low-Risk Dossier (Score ≥750, DTI ≤35%, Loan ≤$25k)',
+    output: 'Automated Sanction Approval & Terms Generation',
+    painPoint: 'Bypasses human underwriting queue for ~38% of qualified applicants',
+    observedIssue: 'Approved in <10 seconds with 100% compliance audit trail',
+    duration: '< 10.0 Seconds',
+    isSTP: true,
+    automationType: 'Automated STP Decision Engine'
+  },
+  {
+    id: 'TOBE-05',
+    name: 'Track B: Unified Underwriter Exception Workbench',
+    lane: 'Underwriting',
+    owner: 'Licensed Underwriter',
+    stage: '4. Decisioning (Track B)',
+    input: 'Complex / Edge-Case Dossier (Score 650–749, DTI 36–50%, >$25k)',
+    output: 'Underwriter adverse action / conditional approval',
+    painPoint: 'Human review reserved exclusively for high-ticket and policy exceptions',
+    observedIssue: 'Single-screen workbench with pre-calculated ratios cuts review touch time to 25 mins',
+    duration: '2.5 Hours (Avg)',
+    isException: true,
+    automationType: 'Unified Decision Workbench'
+  },
+  {
+    id: 'TOBE-06',
+    name: 'Digital Sanction & Mobile OTP Cryptographic e-Sign',
+    lane: 'Customer',
+    owner: 'Borrower (Mobile / Web)',
+    stage: '5. Execution',
+    input: 'Digital Sanction Letter',
+    output: 'Cryptographically signed legal agreement',
+    painPoint: 'Eliminates mandatory branch visit and 24h wet-ink signing lag',
+    observedIssue: 'Executed instantly on smartphone via secure two-factor SMS OTP',
+    duration: '< 10 Minutes',
+    automationType: 'Cryptographic e-Signature Service'
+  },
+  {
+    id: 'TOBE-07',
+    name: 'Automated Core Banking API Payment Release',
+    lane: 'Core Banking',
+    owner: 'Payment Rail Microservice',
+    stage: '6. Disbursement',
+    input: 'e-Signed contract event trigger',
+    output: 'Immediate account credit & customer SMS notification',
+    painPoint: 'Replaces manual batch keying with automated API payment release',
+    observedIssue: 'Funds disbursed into borrower account within <15 minutes post-signing',
+    duration: '< 15 Minutes',
+    automationType: 'Real-Time Payment API Trigger'
+  }
+];
+
+// ---------------------------------------------------------
+// 4 Primary Bottlenecks (Ranked)
+// ---------------------------------------------------------
+export const BOTTLENECKS_RANKED: Bottleneck[] = [
+  {
+    id: 'BN-01',
+    title: 'Document Intake Rework Loop',
+    stage: 'Document Validation',
+    problem: '35% of all loan applications require secondary document submissions due to blurry or incomplete uploads.',
+    rootCause: 'Intake decoupled from validation; generic static document checklist without point-of-upload image resolution checks.',
+    idleLatency: '+7.3 Hours Average Latency',
+    failureRate: '35.0% Document Rework Rate',
+    severity: 5,
+    proposedSolution: 'Client-side DPI resolution pre-validation (≥300 DPI) and dynamic employment-tailored checklists.',
+    relatedReq: 'BR-03, FR-02, FR-04'
+  },
+  {
+    id: 'BN-02',
+    title: 'Undifferentiated FIFO Underwriting Backlog',
+    stage: 'Credit Underwriting',
+    problem: '100% of loans routed into a single manual queue regardless of credit profile, generating 9.5 hours of idle dwell time.',
+    rootCause: 'Absence of an automated Credit Decision Engine with codified policy thresholds for low-risk Straight-Through-Processing.',
+    idleLatency: '+9.5 Hours Idle Queue Wait',
+    failureRate: '0% STP Adoption Baseline',
+    severity: 5,
+    proposedSolution: 'Dual-track decision engine enabling 38% Straight-Through-Processing (STP) for Tier 1 low-risk applicants.',
+    relatedReq: 'BR-01, BR-05, FR-14'
+  },
+  {
+    id: 'BN-03',
+    title: 'Manual System Handoffs & Data Transcription',
+    stage: 'System Integration',
+    problem: 'Staff manually re-key applicant data across 4 legacy platforms, causing 11.5% copy-paste errors and handoff drag.',
+    rootCause: 'Fragmented siloed databases lacking a centralized RESTful API enterprise integration bus.',
+    idleLatency: '+4.0 Hours Handoff Latency',
+    failureRate: '11.5% Data Transcription Errors',
+    severity: 4,
+    proposedSolution: 'Enterprise API Gateway synchronizing applicant state across CRM, LOS, and Core Banking.',
+    relatedReq: 'BR-06, FR-08, FR-19'
+  },
+  {
+    id: 'BN-04',
+    title: 'Incomplete Initial Submissions',
+    stage: 'Application Capture',
+    problem: '18% of applications held in pending status due to missing mandatory disclosures or mismatched income data.',
+    rootCause: 'Static application forms that do not enforce progressive field validation or context-sensitive prompts.',
+    idleLatency: '+5.2 Hours Idle Wait',
+    failureRate: '18.0% Additional Info Requests',
+    severity: 4,
+    proposedSolution: 'Responsive progressive intake portal with real-time field validation and context guidance.',
+    relatedReq: 'BR-02, FR-01, FR-03'
+  }
+];
+
+// ---------------------------------------------------------
+// 5 Whys Root Cause Chains
+// ---------------------------------------------------------
 export const FIVE_WHYS_DATA: FiveWhyItem[] = [
   {
     id: '5W-1',
-    title: 'High Document Rework Rate (35%)',
-    problem: '3,500 personal loan applications per month require secondary document uploads.',
+    title: 'Root Cause: High Document Rework (35%)',
+    problem: '35% of all loan applications fail initial review and require secondary document uploads.',
     whys: [
-      'Why 1: Uploaded salary slips and IDs are blurry, expired, cropped, or from wrong dates.',
-      'Why 2: Applicants are unclear about exact requirements and receive no feedback during upload.',
-      'Why 3: The intake portal presents a static, generic form that does not adapt to employment type.',
-      'Why 4: Document inspection is performed entirely manually by backoffice staff hours/days later.',
-      'Why 5 (Root Cause): Absence of an intelligent digital intake layer with dynamic checklists and client-side resolution pre-validation (≥300 DPI).'
+      'Why? Uploaded salary slips and IDs are blurry, expired, cropped, or from outdated statement months.',
+      'Why? Applicants are unclear about exact requirements and receive zero feedback during upload.',
+      'Why? The intake portal presents a static, generic form that does not adapt to employment type.',
+      'Why? Document inspection is performed entirely manually by backoffice staff hours or days later.',
+      'Why? Absence of an intelligent digital intake layer with dynamic checklists and client-side resolution pre-validation (≥300 DPI).'
     ],
-    rootCause: 'Intake decoupled from validation; absence of dynamic checklists & client-side pre-validation.',
-    solution: 'Dynamic Checklist (FR-02) + Automated Pre-Validation Engine (FR-04).',
-    kpi: 'Document rework rate drops from 35.0% to 8.0% (-77% reduction).'
+    rootCause: 'Lack of dynamic, rules-driven document pre-validation at the point of customer upload.',
+    solution: 'Dynamic Checklist (FR-02) + Automated Pre-Validation Engine with DPI ≥ 300 enforcement (FR-04).',
+    kpi: 'Document Rework Rate drops from 35.0% to 8.0% (-77%).'
   },
   {
     id: '5W-2',
-    title: 'Underwriting Queue Congestion (9.5h Wait)',
-    problem: 'Applications spend an average of 9.5 hours of non-value-add idle queue time in Underwriting.',
+    title: 'Root Cause: 9.5h Underwriting Idle Queue Dwell Time',
+    problem: 'Applications spend an average of 9.5 hours of non-value-add idle queue wait in Underwriting.',
     whys: [
-      'Why 1: Underwriters face an unmanageable backlog of 150+ applications per queue.',
-      'Why 2: Every single loan application, regardless of risk, must be manually reviewed by an underwriter.',
-      'Why 3: The bank does not have automated Straight-Through Processing (STP) rules enabled.',
-      'Why 4: Credit bureau data and DTI ratios are calculated manually on Excel spreadsheets.',
-      'Why 5 (Root Cause): Credit policy rules are not codified into an automated decision engine connected via API to credit bureaus.'
+      'Why? Underwriters face an unmanageable daily backlog of 150+ applications per queue.',
+      'Why? Every single loan application, regardless of risk, must be manually reviewed by an underwriter.',
+      'Why? The bank does not have automated Straight-Through Processing (STP) rules enabled.',
+      'Why? Credit bureau data and DTI ratios are calculated manually on Excel spreadsheets.',
+      'Why? Credit policy rules are not codified into an automated decision engine connected via API to credit bureaus.'
     ],
-    rootCause: 'All-or-nothing manual underwriting policy; lack of rule-based automated decisioning.',
-    solution: 'Bureau API (FR-11) + Algorithmic DTI Engine (FR-12) + Tier 1 STP Engine (FR-14).',
-    kpi: 'Average TAT drops from 5.0 days to 1.8 days; 38% STP volume achieved.'
+    rootCause: 'Undifferentiated manual underwriting queue without automated Straight-Through-Processing for qualified low-risk profiles.',
+    solution: 'Credit Bureau API (FR-11) + Algorithmic DTI Engine (FR-12) + Tier 1 STP Decision Engine (FR-14).',
+    kpi: 'Average TAT drops from 5.0 to 1.8 days (-64%); 38% STP volume achieved.'
   },
   {
     id: '5W-3',
-    title: 'High Inbound Customer Status Calls (3.2 / loan)',
-    problem: 'NovaBank receives 32,000 inbound status inquiry contacts per month regarding loan applications.',
+    title: 'Root Cause: High Inbound Inquiries (3.2 Calls / Loan)',
+    problem: 'NovaBank receives 32,000 inbound status inquiry contacts per month regarding loan progress.',
     whys: [
-      'Why 1: Customers do not know what stage their application is in or why it is delayed.',
-      'Why 2: The bank does not send status updates between initial intake and final loan sanction.',
-      'Why 3: Status transitions occur across disconnected internal systems with no notification trigger.',
-      'Why 4: The customer web portal has no self-service tracking interface or real-time stepper.',
-      'Why 5 (Root Cause): Application state transitions are siloed across 4 legacy databases without a centralized customer event orchestration layer.'
+      'Why? Customers do not know what stage their application is in or why it is delayed.',
+      'Why? The bank does not send status updates between initial intake and final loan sanction.',
+      'Why? Status transitions occur across disconnected internal systems with no notification trigger.',
+      'Why? The customer web portal has no self-service tracking interface or real-time stepper.',
+      'Why? Application state transitions are siloed across 4 legacy databases without a centralized customer event orchestration layer.'
     ],
-    rootCause: 'Siloed departmental systems lacking an event-driven customer notification and tracking hub.',
-    solution: 'Self-Service 5-Stage Milestone Tracker (FR-20) + Automated Notification Service (FR-07).',
-    kpi: 'Status inquiries drop from 3.2 to 0.6 calls/loan (-81% reduction in branch load).'
+    rootCause: 'Opaque black-box processing without centralized milestone tracking or automated event notifications.',
+    solution: '24/7 Self-Service Milestone Hub (FR-20) + Automated Event Notification Service (FR-07).',
+    kpi: 'Status inquiries drop from 3.2 to 0.6 calls/loan (-81%).'
   }
 ];
 
+// ---------------------------------------------------------
+// 6M Fishbone Cause-and-Effect Categories
+// ---------------------------------------------------------
 export const FISHBONE_DATA = {
   people: [
-    'Branch officers and loan ops communicate via un-tracked manual emails',
-    'Relationship managers spend 40% of working time chasing missing paperwork',
-    'Underwriters face uneven queue surges with no workload rebalancing'
+    'RMs spend 40% of working hours chasing missing paperwork rather than advisory selling.',
+    'Underwriters burdened with manual review of pristine low-risk files.',
+    'Manual email coordination between branch staff and central operations.'
   ],
   process: [
-    'Document verification occurs 24-48h post-intake rather than upfront',
-    'Sequential processing of KYC, Bureau, and Underwriting rather than parallel checks',
-    'Rework loop sends rejected files back to end of operations queue'
+    'Document verification decoupled from point-of-intake upload.',
+    'Rejected applications sent back to beginning of sequential queue (+48h lag).',
+    'Mandatory physical branch visits for wet-ink contract execution.'
   ],
   technology: [
-    '4 disconnected legacy systems (CRM, KYC, LOS, Core) with zero API sync',
-    'Lack of a programmable credit decision engine for Straight-Through Processing',
-    'No real-time task timer monitors or automated pre-breach SLA alert triggers'
-  ],
-  data: [
-    '11.5% transcription error rate caused by manual re-typing across screens',
-    'Unstructured PDF payslips requiring manual Excel data entry',
-    'Forms permit submission of incomplete demographic and employment fields'
+    '4 disconnected legacy banking systems requiring duplicate data entry.',
+    'Absence of an automated Credit Decisioning Engine (STP).',
+    'Lack of real-time REST APIs for national identity and AML screening.'
   ],
   policy: [
-    'Historical policy mandating 100% manual underwriter review for all loans',
-    'Wet-ink physical contract signing mandate stalling disbursement by 24-48h',
-    'Rigid Delegated Lending Authority caps not tailored for low-risk applicants'
+    '100% manual underwriting mandate regardless of credit bureau score.',
+    'Rigid Delegated Lending Authority (DLA) limits creating approval bottlenecks.',
+    'Physical paper contract retention policies.'
   ],
-  customer: [
-    'Vague instructions cause submission of outdated tax returns or cropped payslips',
-    'Applicants upload blurry smartphone photos (<150 DPI) taken in poor lighting',
-    'Lack of progress visibility drives high customer anxiety and repeated calls'
+  data: [
+    '11.5% data transcription errors from manual copy-pasting across screens.',
+    'Unstructured PDF bank statements requiring manual Excel re-keying.',
+    'Low-resolution (<150 DPI) smartphone document photos accepted at intake.'
+  ],
+  controls: [
+    'Reactive SLA tracking identified only after customer complaint escalation.',
+    'Lack of automated pre-breach alerts at 50% and 75% queue thresholds.',
+    'Fragmented audit logs scattered across 4 separate legacy system databases.'
   ]
 };
 
+// ---------------------------------------------------------
+// 12 Operational Gaps
+// ---------------------------------------------------------
 export const GAP_ANALYSIS_DATA: GapItem[] = [
   {
     id: 'GAP-01',
-    dimension: 'Document Quality & Intake',
-    asIs: 'Manual inspection 24-48h post-intake.',
-    toBe: 'Real-time client-side pre-validation.',
-    gap: 'No client-side DPI (≥300 DPI), format, or completeness check.',
-    impact: 'High rework (35%); +7.3h waiting latency.',
-    improvement: 'Automated Document Pre-Validation Engine with instant feedback.',
+    dimension: 'Document Intake Quality',
+    asIs: 'Manual inspection 24-48h post-intake by backoffice staff',
+    toBe: 'Real-time client-side pre-validation (DPI ≥ 300) at upload',
+    gap: 'Intake decoupled from validation',
+    impact: 'High rework rate (35%); +7.3h idle wait',
+    improvement: 'Deploy automated Pre-Validation Engine with instant error prompts (FR-04)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-02',
-    dimension: 'Checklist Customization',
-    asIs: 'Static generic document checklist.',
-    toBe: 'Dynamic profile-driven document checklist.',
-    gap: 'System does not adapt requirements to applicant employment type.',
-    impact: '18% applications stalled for missing info.',
-    improvement: 'Dynamic Checklist Engine adapting to Salaried / Self-Employed.',
+    dimension: 'Checklist Personalization',
+    asIs: 'Static generic document checklist for all loan applicants',
+    toBe: 'Dynamic checklist adapting to Salaried / Self-Employed',
+    gap: 'No applicant-specific document rules',
+    impact: '18% applications held for additional information',
+    improvement: 'Context-sensitive Dynamic Checklist Engine (FR-02)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-03',
-    dimension: 'Data Integration',
-    asIs: 'Manual re-keying across 4 systems.',
-    toBe: 'Unified RESTful API microservices sync.',
-    gap: 'No API integration bus connecting CRM, LOS, and Core Banking.',
-    impact: '11.5% transcription errors; 22% handoff delays.',
-    improvement: 'Enterprise API Gateway synchronizing customer data.',
+    dimension: 'System Integration',
+    asIs: 'Manual data re-keying across 4 disconnected legacy systems',
+    toBe: 'Unified RESTful API microservices data synchronization',
+    gap: 'Siloed databases without middleware bus',
+    impact: '11.5% copy-paste errors; handoff latency',
+    improvement: 'Enterprise API Gateway connecting CRM, LOS & Core (FR-08)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-04',
     dimension: 'Credit Assessment',
-    asIs: 'Manual bureau downloads & Excel DTI.',
-    toBe: 'Direct API ingestion & algorithmic DTI.',
-    gap: 'Absence of programmatic credit bureau interface and calculator.',
-    impact: '4.5h credit assessment latency; calculation errors.',
-    improvement: 'Direct bureau API ingestion and real-time DTI calculation engine.',
+    asIs: 'Manual credit bureau downloads & Excel spreadsheet DTI',
+    toBe: 'Direct bureau API ingestion & algorithmic DTI computation',
+    gap: 'Manual ratio calculation on spreadsheets',
+    impact: '4.5h credit latency; calculation errors',
+    improvement: 'Direct Credit Bureau API connector & Algorithmic DTI Engine (FR-11, FR-12)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-05',
     dimension: 'Underwriting Decisioning',
-    asIs: '100% manual review in single FIFO queue.',
-    toBe: 'Dual-track: Tier 1 STP + Exception Desk.',
-    gap: 'Lack of rule-based automated decisioning and risk segmentation.',
-    impact: '9.5h queue dwell time; underwriter bandwidth congested.',
-    improvement: 'Automated Credit Decision Engine with STP for low-risk files.',
+    asIs: '100% manual review in single undifferentiated FIFO queue',
+    toBe: 'Dual-track: 38% Tier 1 STP + Underwriter Exception Desk',
+    gap: 'No automated credit decisioning rules',
+    impact: '9.5h idle queue dwell time',
+    improvement: 'Automated Credit Decision Engine with codified policy rules (FR-14)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-06',
     dimension: 'Customer Transparency',
-    asIs: 'Zero tracking; opaque black-box wait.',
-    toBe: '24/7 5-stage self-service tracker.',
-    gap: 'No customer portal milestone interface or status sync.',
-    impact: '3.2 calls/loan; 32,000 inquiries/month to branches.',
-    improvement: 'Customer self-service milestone tracking hub.',
+    asIs: 'Zero tracking; black-box wait for applicant',
+    toBe: '24/7 5-stage self-service milestone tracker',
+    gap: 'Opaque status visibility',
+    impact: '3.2 inbound inquiry calls per loan (32k calls/mo)',
+    improvement: 'Customer Self-Service Milestone Tracking Hub (FR-20)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-07',
-    dimension: 'Customer Notifications',
-    asIs: 'Manual batch emails sent hours later.',
-    toBe: 'Event-driven instant SMS/Email alerts.',
-    gap: 'No automated omni-channel messaging notification service.',
-    impact: 'Delayed customer response time (average 26 hours).',
-    improvement: 'Automated event-triggered notification service.',
+    dimension: 'Agreement Signing',
+    asIs: 'Physical branch visit for wet-ink contract signature',
+    toBe: 'Mobile OTP cryptographic digital e-Signature',
+    gap: 'Paper contract dependency',
+    impact: '24-48 hours post-approval settlement lag',
+    improvement: 'Mobile OTP Digital e-Signature Service (FR-17)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-08',
-    dimension: 'SLA Monitoring',
-    asIs: 'Reactive tracking after customer complaints.',
-    toBe: 'Proactive countdown monitors & alerts.',
-    gap: 'No real-time task timer monitoring or automated pre-breach alerts.',
-    impact: '14.0% SLA breach rate (1,400 loans/month).',
-    improvement: 'Real-time SLA monitor triggering alerts at 50% & 75% thresholds.',
-    priority: 'Should Have'
+    dimension: 'Payment Disbursement',
+    asIs: 'Manual batch keying into Core Banking payment files',
+    toBe: 'Automated Core Banking API release upon e-Sign verification',
+    gap: 'Batch payment processing delay',
+    impact: '24h settlement delay post-signing',
+    improvement: 'Real-time Core Banking Payment Release API (FR-19)',
+    priority: 'Must Have'
   },
   {
     id: 'GAP-09',
-    dimension: 'Agreement Signing',
-    asIs: 'Branch visit & physical wet-ink sign.',
-    toBe: 'Mobile OTP cryptographic e-Signature.',
-    gap: 'No legal digital e-Signature capability integrated.',
-    impact: '24-48 hours post-approval settlement lag.',
-    improvement: 'Mobile OTP digital e-Signature integration.',
+    dimension: 'KYC & AML Verification',
+    asIs: 'Manual copy-pasting of IDs into external government portals',
+    toBe: 'Automated real-time REST API registry screening in <3s',
+    gap: 'Manual compliance portal lookups',
+    impact: '4.0h KYC cycle time',
+    improvement: 'National ID & AML Watchlist REST API Connectors (FR-09, FR-10)',
     priority: 'Must Have'
   },
   {
     id: 'GAP-10',
-    dimension: 'Disbursement Release',
-    asIs: 'Manual batch payment keying into Core.',
-    toBe: 'Automated Core Banking API release.',
-    gap: 'Payment release decoupled from agreement verification.',
-    impact: '24h funds release delay; risk of manual keying errors.',
-    improvement: 'Automated Core Banking payment rail integration (<15 min).',
-    priority: 'Must Have'
-  },
-  {
-    id: 'GAP-11',
-    dimension: 'KYC Verification',
-    asIs: 'Manual copy-pasting into portals.',
-    toBe: 'Automated real-time API screening.',
-    gap: 'Manual identity matching and compliance search.',
-    impact: '4.0h KYC cycle time; compliance backlog.',
-    improvement: 'Automated National ID Registry & AML screening APIs.',
-    priority: 'Must Have'
-  },
-  {
-    id: 'GAP-12',
-    dimension: 'Underwriter UI',
-    asIs: '5 open windows across separate systems.',
-    toBe: 'Single-screen Unified Decision Workbench.',
-    gap: 'Fragmented UI forcing high cognitive load.',
-    impact: 'Slower review time (1.5h touch time per file).',
-    improvement: 'Unified Underwriter Workbench with pre-calculated ratios.',
+    dimension: 'SLA Monitoring & Governance',
+    asIs: 'Reactive tracking identified only after customer complaints',
+    toBe: 'Proactive countdown timers with 50% & 75% alerts',
+    gap: 'No proactive pre-breach alerts',
+    impact: '14.0% SLA breach rate',
+    improvement: 'Real-time SLA Monitoring Daemon with automated lead escalations (FR-20)',
     priority: 'Should Have'
   }
 ];
 
+// ---------------------------------------------------------
+// Requirements Hub (BR, FR, NFR, Business Rules)
+// ---------------------------------------------------------
 export const BUSINESS_REQUIREMENTS: Requirement[] = [
   {
     id: 'BR-01',
-    category: 'Operational Cycle Time',
-    title: 'Reduce Loan Turnaround Time to < 2.0 Days',
-    description: 'The system and revised operational process shall reduce average end-to-end loan processing TAT from 5.0 business days to under 2.0 business days.',
-    rationale: 'Accelerate time-to-cash, improve conversion against neo-bank competitors, and lower cost per funded loan.',
+    category: 'Cycle Time',
+    title: 'Turnaround Time (TAT) Reduction',
+    description: 'The loan origination lifecycle from intake to disbursement shall be reduced from an average of 5.0 business days to under 2.0 business days (target: 1.8 days).',
+    rationale: 'Accelerate time-to-cash, match neo-bank competitor benchmarks, and reduce applicant drop-off.',
     priority: 'Must Have',
-    relatedProblem: 'P-02: Extended 5-Day TAT'
+    relatedProblem: 'P-02 (5-Day Delay)',
+    relatedProcessStep: 'End-to-End Origination',
+    businessValue: '64% reduction in cycle time; higher origination conversion rate.'
   },
   {
     id: 'BR-02',
     category: 'Intake Quality',
-    title: 'Elevate First-Time-Right (FTR) Rate to ≥ 80%',
-    description: 'The system shall ensure applicant data and uploaded documents are verified for completeness and validity prior to submission.',
-    rationale: 'Drastically reduce downstream rework loops and relieve backoffice processing congestion.',
+    title: 'First-Time-Right (FTR) Submission Rate',
+    description: 'The system shall elevate First-Time-Right (FTR) complete application submissions from 48.0% to at least 80.0% (target: 82.0%).',
+    rationale: 'Prevent downstream rework loops and eliminate unnecessary backoffice processing touches.',
     priority: 'Must Have',
-    relatedProblem: 'P-01: High Document Rework'
+    relatedProblem: 'P-01 (35% Rework)',
+    relatedProcessStep: 'Application Intake',
+    businessValue: '77% reduction in rework files; significant operational capacity liberation.'
   },
   {
     id: 'BR-03',
     category: 'Document Management',
-    title: 'Automate Document Pre-Validation & Ingestion',
-    description: 'The system shall automate upfront inspection of mandatory documentation at the point of ingestion.',
-    rationale: 'Eliminate the 35% manual rework bottleneck caused by illegible or incorrect files.',
+    title: 'Point-of-Ingestion Pre-Validation',
+    description: 'The system shall automate document completeness and image resolution verification at the point of customer upload before file ingestion.',
+    rationale: 'Eliminate manual backoffice document inspection queues and 48-hour email rework lag.',
     priority: 'Must Have',
-    relatedProblem: 'P-01: High Document Rework'
+    relatedProblem: 'P-01 (35% Rework)',
+    relatedProcessStep: 'Document Collection',
+    businessValue: 'Instant feedback to applicant; clean data handover to underwriting.'
   },
   {
     id: 'BR-04',
-    category: 'Customer Experience',
-    title: 'Provide Omni-Channel Status Transparency',
-    description: 'The system shall provide real-time self-service tracking of application milestones to applicants and staff.',
-    rationale: 'Reduce high inbound call volumes (3.2 calls/loan) to branches and contact centers.',
+    category: 'Customer Transparency',
+    title: 'Real-Time Milestone Tracking & Notifications',
+    description: 'The system shall provide 24/7 self-service application milestone tracking and automated event-triggered SMS/Email alerts to applicants.',
+    rationale: 'Reduce 3.2 inbound inquiry calls per application and elevate customer satisfaction.',
     priority: 'Must Have',
-    relatedProblem: 'P-04: High Inquiries'
+    relatedProblem: 'P-04 (Inquiry Overload)',
+    relatedProcessStep: 'Customer Experience',
+    businessValue: '81% reduction in branch inquiry calls (32,000 to 6,000 calls/month).'
   },
   {
     id: 'BR-05',
     category: 'Credit Decisioning',
-    title: 'Enable Segmented Straight-Through Processing (STP)',
-    description: 'The system shall execute automated credit decisioning for qualified low-risk applicants while routing complex files to underwriting queues.',
-    rationale: 'Free up credit analysts and underwriters to focus on complex risk evaluations and policy overrides.',
+    title: 'Automated Straight-Through Processing (STP)',
+    description: 'The system shall enable automated credit sanctioning (Straight-Through Processing) for qualified low-risk Tier 1 applications without human queue intervention.',
+    rationale: 'Liberate licensed underwriter capacity to focus on complex, high-risk, and policy-exception reviews.',
     priority: 'Must Have',
-    relatedProblem: 'P-02: Extended 5-Day TAT'
+    relatedProblem: 'P-02 (Queue Wait)',
+    relatedProcessStep: 'Credit Underwriting',
+    businessValue: '38% of applications approved in <10 seconds; queue dwell time eliminated.'
   },
   {
     id: 'BR-06',
     category: 'System Integration',
-    title: 'Eliminate Redundant Cross-System Data Entry',
-    description: 'The system shall maintain a unified data layer synchronizing applicant, loan, and KYC data across all core banking platforms.',
-    rationale: 'Reduce transcription errors and eliminate manual handoff delays (22% baseline).',
+    title: 'Enterprise RESTful Data Synchronization',
+    description: 'The system shall eliminate duplicate manual data entry across CRM, LOS, Credit Bureau, and Core Banking through an enterprise API microservices bus.',
+    rationale: 'Eliminate 11.5% copy-paste errors and manual handoff latency between departments.',
     priority: 'Must Have',
-    relatedProblem: 'P-03: Duplicate Data Entry'
-  },
-  {
-    id: 'BR-07',
-    category: 'Governance & Operations',
-    title: 'Proactive SLA Monitoring & Automated Escalation',
-    description: 'The system shall track task times against departmental SLAs and automatically escalate stagnating files before breaches occur.',
-    rationale: 'Prevent applications from sitting unnoticed in employee inboxes and reduce customer SLA violations.',
-    priority: 'Must Have',
-    relatedProblem: 'P-05: High SLA Breaches'
-  },
-  {
-    id: 'BR-08',
-    category: 'Regulatory Compliance',
-    title: 'Preserve Regulatory Compliance & Auditability',
-    description: 'The system shall enforce strict KYC/AML verification, credit risk limits, Fair Lending guidelines, and immutable audit logging.',
-    rationale: 'Ensure 100% adherence to banking regulations and prevent financial/reputational compliance penalties.',
-    priority: 'Must Have',
-    relatedProblem: 'P-06: KYC Compliance Bottleneck'
-  },
-  {
-    id: 'BR-09',
-    category: 'Communication',
-    title: 'Automate Event-Driven Customer Communications',
-    description: 'The system shall automatically trigger contextual notifications (SMS/Email/Push) whenever an application changes status.',
-    rationale: 'Eliminate opaque waiting periods and ensure applicants rectify deficiencies immediately.',
-    priority: 'Must Have',
-    relatedProblem: 'P-04: High Inquiries'
-  },
-  {
-    id: 'BR-10',
-    category: 'Disbursement',
-    title: 'Streamline Electronic Agreement & Instant Disbursement',
-    description: 'The system shall support digital sanction issuance, mobile OTP e-Signatures, and automated Core Banking payment releases.',
-    rationale: 'Shorten post-approval funds release from 24 hours to < 15 minutes.',
-    priority: 'Must Have',
-    relatedProblem: 'P-07: Paper Agreement Lag'
+    relatedProblem: 'P-03 (System Fragmentation)',
+    relatedProcessStep: 'System Handoffs',
+    businessValue: 'Manual touchpoints reduced from 12 to 4; zero data transcription errors.'
   }
 ];
 
 export const FUNCTIONAL_REQUIREMENTS: Requirement[] = [
   {
     id: 'FR-01',
-    category: 'Intake',
-    title: 'Digital Application Capture',
-    description: 'The system shall provide a responsive web/mobile form capturing demographics, income, and loan parameters with real-time validation.',
-    rationale: 'Prevents incomplete form submissions.',
+    category: 'Digital Intake',
+    title: 'Responsive Omni-Channel Application Capture',
+    description: 'The system shall provide a responsive web and mobile application interface with real-time field validation, format masking, and auto-save capability.',
+    rationale: 'Enable frictionless applicant intake across branch tablet and consumer web channels.',
     priority: 'Must Have',
-    relatedProblem: 'P-01'
+    relatedProblem: 'P-01',
+    relatedProcessStep: 'Step 1: Intake'
   },
   {
     id: 'FR-02',
-    category: 'Intake',
-    title: 'Dynamic Document Checklist',
-    description: 'The system shall dynamically display required documents based on employment type (Salaried, Self-Employed) and loan amount.',
-    rationale: 'Ensures customers upload correct files first time.',
+    category: 'Intake Quality',
+    title: 'Dynamic Profile-Driven Document Checklist',
+    description: 'The system shall dynamically generate required document checklists based on applicant employment profile (Salaried vs. Self-Employed) and loan tier.',
+    rationale: 'Ensure applicants receive and upload only mandatory documents relevant to their profile.',
     priority: 'Must Have',
-    relatedProblem: 'P-01'
-  },
-  {
-    id: 'FR-03',
-    category: 'Intake',
-    title: 'Secure Multi-File Upload',
-    description: 'The system shall allow uploads in PDF, JPEG, and PNG (up to 15MB per file) with multi-page batch upload support.',
-    rationale: 'Ensures high quality file ingestion.',
-    priority: 'Must Have',
-    relatedProblem: 'P-01'
+    relatedProblem: 'P-01',
+    relatedProcessStep: 'Step 1: Intake'
   },
   {
     id: 'FR-04',
-    category: 'Validation',
-    title: 'Automated Document Pre-Validation',
-    description: 'The system shall inspect uploaded documents in real time for resolution (≥ 300 DPI), format, and file integrity.',
-    rationale: 'Eliminates 35% rework by rejecting bad scans at upload.',
+    category: 'Document Management',
+    title: 'Automated Client-Side Image & Resolution Pre-Validation',
+    description: 'The system shall inspect uploaded files in real time for DPI resolution (≥300 DPI), file size (<10MB), and readable format before permitting submission.',
+    rationale: 'Reject blurry or cropped scans immediately with inline corrective prompts.',
     priority: 'Must Have',
-    relatedProblem: 'P-01'
-  },
-  {
-    id: 'FR-05',
-    category: 'Automation',
-    title: 'OCR & Data Extraction Engine',
-    description: 'The system shall extract key data fields (National ID, full name, DOB, employer, salary) from uploaded documents.',
-    rationale: 'Accelerates data verification.',
-    priority: 'Should Have',
-    relatedProblem: 'P-03'
-  },
-  {
-    id: 'FR-06',
-    category: 'Validation',
-    title: 'Automated Demographic Cross-Match',
-    description: 'The system shall cross-reference OCR extractions against form inputs with a 90% fuzzy-match confidence threshold.',
-    rationale: 'Detects data entry mismatches automatically.',
-    priority: 'Must Have',
-    relatedProblem: 'P-03'
-  },
-  {
-    id: 'FR-07',
-    category: 'Notification',
-    title: 'Document Deficiency Notification',
-    description: 'The system shall automatically dispatch SMS/Email alerts with secure direct upload links when documents are rejected.',
-    rationale: 'Reduces customer response time from 26h to <6h.',
-    priority: 'Must Have',
-    relatedProblem: 'P-04'
+    relatedProblem: 'P-01',
+    relatedProcessStep: 'Step 1: Ingestion'
   },
   {
     id: 'FR-08',
     category: 'Integration',
-    title: 'Unified Customer Record Sync',
-    description: 'The system shall synchronize applicant data with Core Banking and CRM systems without requiring manual re-keying.',
-    rationale: 'Eliminates duplicate manual typing.',
+    title: 'Enterprise Data Synchronization via REST API',
+    description: 'The system shall synchronize applicant demographic, financial, and loan status data across CRM, LOS, and Core Banking in real time via JSON REST APIs.',
+    rationale: 'Eliminate manual re-keying and ensure a single source of truth across all banking systems.',
     priority: 'Must Have',
-    relatedProblem: 'P-03'
+    relatedProblem: 'P-03',
+    relatedProcessStep: 'Step 2: Handoffs'
   },
   {
     id: 'FR-09',
     category: 'Compliance',
-    title: 'Automated National ID Registry API',
-    description: 'The system shall trigger a real-time API call to the National Identity Registry to verify applicant legal identity.',
-    rationale: 'Accelerates KYC verification to <3 seconds.',
+    title: 'National Identity Registry Real-Time API Integration',
+    description: 'The system shall transmit applicant ID credentials to the National Identity Registry API and receive real-time authentication tokens in < 3.0 seconds.',
+    rationale: 'Automate identity verification without manual compliance portal searching.',
     priority: 'Must Have',
-    relatedProblem: 'P-06'
-  },
-  {
-    id: 'FR-10',
-    category: 'Compliance',
-    title: 'Automated AML & Watchlist Screening',
-    description: 'The system shall screen applicants against global PEP, OFAC, and domestic AML sanctions databases automatically.',
-    rationale: 'Guarantees compliance without manual search.',
-    priority: 'Must Have',
-    relatedProblem: 'P-06'
+    relatedProblem: 'P-06',
+    relatedProcessStep: 'Step 2: KYC'
   },
   {
     id: 'FR-11',
     category: 'Credit Risk',
-    title: 'Direct Credit Bureau API Ingestion',
-    description: 'The system shall automatically pull applicant credit file and score from credit bureaus via secure REST API.',
-    rationale: 'Eliminates manual bureau PDF downloads.',
+    title: 'Direct Credit Rating Bureau API Ingestion',
+    description: 'The system shall ingest applicant credit scores, active trade-lines, and delinquency history directly from the Credit Bureau via secure REST API in < 3.0 seconds.',
+    rationale: 'Eliminate manual bureau PDF downloads and spreadsheet extraction.',
     priority: 'Must Have',
-    relatedProblem: 'P-02'
+    relatedProblem: 'P-02',
+    relatedProcessStep: 'Step 3: Credit'
   },
   {
     id: 'FR-12',
     category: 'Credit Risk',
-    title: 'Automated DTI Calculation Engine',
-    description: 'The system shall aggregate debt obligations from credit file and compute Debt-to-Income (DTI) and FOIR ratios.',
-    rationale: 'Eliminates spreadsheet calculation errors.',
+    title: 'Algorithmic Debt-to-Income (DTI) Computation Engine',
+    description: 'The system shall compute DTI, Fixed Obligation to Income Ratio (FOIR), and Disposable Income algorithmically using verified income and bureau obligations.',
+    rationale: 'Replace manual Excel computations and eliminate calculation errors.',
     priority: 'Must Have',
-    relatedProblem: 'P-02'
-  },
-  {
-    id: 'FR-13',
-    category: 'Decisioning',
-    title: 'Rule-Based Credit Decisioning Engine',
-    description: 'The system shall evaluate applications against credit policy rules (minimum score, max DTI, minimum tenure).',
-    rationale: 'Enables consistent, objective decisioning.',
-    priority: 'Must Have',
-    relatedProblem: 'P-02'
+    relatedProblem: 'P-02',
+    relatedProcessStep: 'Step 3: Credit'
   },
   {
     id: 'FR-14',
     category: 'Decisioning',
-    title: 'Straight-Through Processing (STP) Execution',
-    description: 'For Tier 1 applicants (Score ≥750, DTI ≤35%, Loan ≤$25k), the system shall execute automated approval in <10s.',
-    rationale: 'Delivers 38% STP volume with zero human touch.',
+    title: 'Automated Straight-Through Processing (STP) Decision Engine',
+    description: 'The system shall auto-approve Tier 1 low-risk applications (Score ≥750, DTI ≤35%, Loan ≤$25k) in <10 seconds without routing to a human underwriter queue.',
+    rationale: 'Deliver instant decisions for pristine credit files and eliminate 9.5h queue dwell time.',
     priority: 'Must Have',
-    relatedProblem: 'P-02'
-  },
-  {
-    id: 'FR-15',
-    category: 'Workflow',
-    title: 'Intelligent Exception Queue Routing',
-    description: 'Applications failing STP shall auto-route to Underwriter queues based on delegated approval limits.',
-    rationale: 'Ensures complex files reach licensed officers.',
-    priority: 'Must Have',
-    relatedProblem: 'P-02'
+    relatedProblem: 'P-02',
+    relatedProcessStep: 'Step 4: Decision'
   },
   {
     id: 'FR-16',
     category: 'Underwriting',
-    title: 'Underwriter Decision Workbench',
-    description: 'The system shall provide a unified workbench displaying pre-calculated ratios, bureau highlights, and policy flags.',
-    rationale: 'Accelerates manual review from 90m to 20m.',
+    title: 'Unified Decision Workbench for Underwriter Exceptions',
+    description: 'The system shall provide licensed underwriters with a single-screen workbench displaying risk highlights, pre-calculated ratios, and adverse action tools.',
+    rationale: 'Accelerate review of complex/high-risk files by eliminating 5 disconnected open windows.',
     priority: 'Must Have',
-    relatedProblem: 'P-02'
+    relatedProblem: 'P-02',
+    relatedProcessStep: 'Step 4: Decision'
   },
   {
     id: 'FR-17',
-    category: 'Disbursement',
-    title: 'Digital Sanction Letter & e-Sign Issuance',
-    description: 'The system shall generate personalized sanction letters and enable mobile OTP cryptographic e-Signatures.',
-    rationale: 'Eliminates branch physical signing visits.',
+    category: 'Execution',
+    title: 'Mobile OTP Digital Cryptographic e-Signature',
+    description: 'The system shall issue digital sanction letters with secure mobile OTP two-factor cryptographic e-Signatures compliant with legal electronic signature standards.',
+    rationale: 'Eliminate physical branch visits and 24-hour wet-ink signing delays.',
     priority: 'Must Have',
-    relatedProblem: 'P-07'
-  },
-  {
-    id: 'FR-18',
-    category: 'Disbursement',
-    title: 'Pre-Disbursement Condition Checklist',
-    description: 'The system shall verify e-Sign completion, direct debit mandate, and bank account name match before unlocking funds.',
-    rationale: 'Safeguards financial controls.',
-    priority: 'Must Have',
-    relatedProblem: 'P-07'
+    relatedProblem: 'P-07',
+    relatedProcessStep: 'Step 5: Execution'
   },
   {
     id: 'FR-19',
     category: 'Disbursement',
-    title: 'Automated Core Banking Payment Trigger',
-    description: 'The system shall trigger an automated funds transfer instruction to Core Banking payment rails.',
-    rationale: 'Releases funds in <15 minutes post-approval.',
+    title: 'Automated Core Banking Payment Release API Trigger',
+    description: 'Upon verification of valid e-Sign and active direct debit, the system shall trigger automated payment release into the applicant account within <15 minutes.',
+    rationale: 'Eliminate manual batch keying and end-of-day settlement delays.',
     priority: 'Must Have',
-    relatedProblem: 'P-07'
+    relatedProblem: 'P-07',
+    relatedProcessStep: 'Step 6: Settlement'
   },
   {
     id: 'FR-20',
     category: 'Governance',
-    title: 'Proactive SLA Monitor & Visual Status Tracker',
-    description: 'The system shall provide a 5-stage customer tracker and an internal SLA dashboard with amber (50%) and red (75%) alerts.',
-    rationale: 'Reduces inquiries and prevents SLA breaches.',
+    title: 'Proactive Real-Time SLA Monitor & Escalation Engine',
+    description: 'The system shall track elapsed processing time against SLA thresholds and dispatch automated escalation alerts to team leads when tasks reach 75% of limit.',
+    rationale: 'Reduce SLA breaches from 14.0% to under 4.0% through proactive intervention.',
     priority: 'Must Have',
-    relatedProblem: 'P-04, P-05'
+    relatedProblem: 'P-05',
+    relatedProcessStep: 'End-to-End Governance'
+  }
+];
+
+export const NON_FUNCTIONAL_REQUIREMENTS: Requirement[] = [
+  {
+    id: 'NFR-01',
+    category: 'Security & Access Control',
+    title: 'Role-Based Access Control (RBAC) & AES-256 Encryption',
+    description: 'The system shall enforce granular RBAC, multi-factor authentication (MFA) for staff, AES-256 encryption at rest, and TLS 1.3 encryption in transit for all applicant PII.',
+    rationale: 'Statutory compliance with banking data protection mandates and zero unauthorized access.',
+    priority: 'Must Have',
+    relatedProblem: 'P-06'
+  },
+  {
+    id: 'NFR-02',
+    category: 'System Performance',
+    title: 'Sub-3-Second API Latency',
+    description: 'The system shall execute external API calls (National ID, Credit Bureau, AML Watchlist) within 3.0 seconds (95th percentile) and page load times under 1.5 seconds.',
+    rationale: 'High operational throughput and frictionless customer experience.',
+    priority: 'Must Have',
+    relatedProblem: 'P-02'
+  },
+  {
+    id: 'NFR-03',
+    category: 'Availability',
+    title: '99.9% Production Uptime',
+    description: 'The digital intake portal and workflow engine shall maintain 99.9% availability during business operating hours (24/7 digital intake availability).',
+    rationale: 'Ensure uninterrupted customer application submissions.',
+    priority: 'Must Have',
+    relatedProblem: 'P-04'
+  },
+  {
+    id: 'NFR-04',
+    category: 'Auditability',
+    title: 'Immutable 7-Year Audit Trail',
+    description: 'The system shall maintain an immutable, tamper-evident audit log recording every system action, credit pull, score query, underwriter note, and approval for 7 years.',
+    rationale: '100% regulatory examination compliance and Fair Lending defense.',
+    priority: 'Must Have',
+    relatedProblem: 'P-06'
   }
 ];
 
@@ -844,256 +970,78 @@ export const BUSINESS_RULES: BusinessRule[] = [
     id: 'BR-RULE-01',
     name: 'Mandatory KYC Completion Prior to Underwriting',
     category: 'Compliance',
-    rule: 'No application shall proceed to credit scoring, underwriting, or decisioning until Customer Due Diligence (CDD) and AML/PEP screening have passed.',
-    enforcement: 'Hard system state lock at KYC_PENDING.'
+    rule: 'No application shall proceed to credit scoring, decisioning, or sanction until Customer Due Diligence (CDD) and AML/PEP screening have passed with zero active flags.',
+    enforcement: 'Hard system lock in workflow engine at state KYC_PENDING; bypass impossible without compliance officer override.'
   },
   {
     id: 'BR-RULE-02',
     name: 'Minimum Age & Residency Eligibility',
     category: 'Eligibility',
-    rule: 'Applicant must be between 21 and 60 years of age at loan maturity and a citizen or permanent resident of the operating jurisdiction.',
-    enforcement: 'Automated pre-qualification form validation.'
+    rule: 'Applicant must be at least 21 years of age at origination and no older than 60 years at loan maturity, and must be a citizen or verified permanent resident.',
+    enforcement: 'Automated field validation against verified date of birth and national identity registry data.'
   },
   {
     id: 'BR-RULE-03',
     name: 'Minimum Net Monthly Income Threshold',
     category: 'Credit Risk',
-    rule: 'Applicant must demonstrate verified net monthly income of ≥ $2,500 (Salaried) or annual net profit of ≥ $40,000 (Self-Employed).',
-    enforcement: 'Calculated from OCR salary slips / tax returns.'
-  },
-  {
-    id: 'BR-RULE-04',
-    name: 'Employment Stability Mandate',
-    category: 'Credit Risk',
-    rule: 'Salaried applicants must have ≥ 6 months continuous tenure with current employer; self-employed must have ≥ 24 months operating history.',
-    enforcement: 'Cross-referenced against employer reference data.'
+    rule: 'Applicant must demonstrate verified net monthly income of ≥ $2,500 (Salaried) or net annual profit of ≥ $40,000 (Self-Employed) over the preceding financial year.',
+    enforcement: 'Algorithmic calculation from OCR bank statements and verified tax filings; shortfall triggers auto-decline code INC_MIN_FAIL.'
   },
   {
     id: 'BR-RULE-05',
     name: 'Debt-to-Income (DTI) Hard Ceiling',
     category: 'Credit Risk',
-    rule: 'Total monthly debt obligations (including proposed NovaBank personal loan EMI) must not exceed 50.0% of verified net monthly income.',
-    enforcement: 'DTI > 50% triggers automatic decline.'
+    rule: 'Total monthly debt service obligations (existing loans + proposed loan EMI) must not exceed 50.0% of verified net monthly income under any circumstance.',
+    enforcement: 'DTI > 50.0% triggers automatic decline code DTI_EXCEEDS_CAP without manual waiver option.'
   },
   {
     id: 'BR-RULE-06',
     name: 'Automated Straight-Through Processing (STP) Eligibility',
     category: 'Decisioning',
-    rule: 'STP Approval granted IF AND ONLY IF: Score ≥ 750, DTI ≤ 35.0%, Loan Amount ≤ $25,000, Employment ≥ 12 months, and zero adverse AML flags.',
-    enforcement: 'Decision Engine executes instant sanction token.'
+    rule: 'STP Auto-Approval granted IF AND ONLY IF: Credit Score ≥ 750, DTI ≤ 35.0%, Loan Amount ≤ $25,000, Employment Tenor ≥ 12 months, clean KYC, and zero active delinquencies.',
+    enforcement: 'Credit Decision Engine executes instant state transition to SANCTION_APPROVED in < 10 seconds.'
   },
   {
     id: 'BR-RULE-07',
     name: 'Mandatory Human Underwriter Review Thresholds',
     category: 'Decisioning',
-    rule: 'Score 650–749, OR DTI 36–50%, OR Loan Amount > $25,000, OR Self-Employed profiles MUST route to licensed Underwriter.',
-    enforcement: 'Workflow engine routes to Underwriter Worklist.'
+    rule: 'Applications with Credit Score 650–749, OR DTI 36.0%–50.0%, OR Loan Amount > $25,000, OR Self-Employed status MUST be routed to the Underwriter Exception Workbench.',
+    enforcement: 'Workflow engine routes task to Underwriter Worklist; STP execution disabled.'
   },
   {
     id: 'BR-RULE-08',
     name: 'Automatic Hard Decline Criteria',
     category: 'Credit Risk',
-    rule: 'Automatic decline if: Credit Score < 600, active bankruptcy / >90 DPD delinquency in 24 months, DTI > 50%, or fraudulent documentation.',
-    enforcement: 'System transitions to DECLINED with adverse codes.'
+    rule: 'System shall auto-decline applications with: Credit Score < 600, active bankruptcy, >90 Days Past Due (DPD) delinquency in past 24 months, or fraudulent documents.',
+    enforcement: 'State transitions immediately to DECLINED; adverse action notification dispatched with regulatory reason codes.'
   },
   {
     id: 'BR-RULE-09',
     name: 'Delegated Lending Authority (DLA) Tiers',
     category: 'Governance',
-    rule: 'Junior Underwriter: up to $15k; Senior Underwriter: up to $35k; Credit Committee / Head of Credit: > $35k or policy waivers.',
-    enforcement: 'Role-Based Access Control limits approval buttons.'
+    rule: 'Junior Underwriter: approval up to $15,000; Senior Underwriter: approval up to $35,000; Credit Committee: approvals > $35,000 or policy exception waivers.',
+    enforcement: 'Role-Based Access Control (RBAC) gates approval action buttons based on user credentials and ticket size.'
   },
   {
     id: 'BR-RULE-10',
-    name: 'Mandatory Rejection & Adverse Action Codes',
+    name: 'Mandatory Adverse Action & Rejection Reason Codes',
     category: 'Compliance',
-    rule: 'Any credit decline or policy exception approval must record standardized reason codes and min 25-character underwriter commentary.',
-    enforcement: 'Form validation enforces reason code selection.'
+    rule: 'Every credit decline or policy override must record standardized Fair Lending adverse action reason codes and a minimum 25-character underwriter justification note.',
+    enforcement: 'Form submission blocked if reason code dropdown is unselected or justification text is below character limit.'
   },
   {
     id: 'BR-RULE-11',
     name: 'Operational SLA Timeframes & Escalation',
     category: 'Governance',
-    rule: 'Doc Review: 4h; KYC: 4h; Underwriting: 8h; Disbursement: 2h. Reaching 75% of SLA triggers automatic Team Lead escalation.',
-    enforcement: 'Real-time daemon monitors timer thresholds.'
+    rule: 'Target SLAs: Doc Review ≤ 4h; KYC ≤ 4h; Underwriting ≤ 8h; Disbursement ≤ 2h. Breaching 75% of limit triggers automated email alert to Operations Team Lead.',
+    enforcement: 'Background SLA daemon evaluates queue timestamps every 60 seconds.'
   },
   {
     id: 'BR-RULE-12',
     name: 'Disbursement Lock & Pre-Disbursement Verification',
     category: 'Governance',
-    rule: 'Funds release locked until e-Sign verified, direct debit active, and destination account confirmed in applicant legal name.',
-    enforcement: 'Core Banking API release gated behind 3 flags.'
-  }
-];
-
-export const TRACEABILITY_MATRIX: TraceabilityRow[] = [
-  {
-    problemId: 'P-01',
-    problem: 'High Document Rework (35% of applications)',
-    rootCause: 'Intake decoupled from validation; static generic checklist.',
-    brId: 'BR-03, BR-02',
-    frId: 'FR-02, FR-04, FR-07',
-    usId: 'US-01, US-02',
-    solution: 'Dynamic Checklist & Client-Side DPI Pre-Validation Engine',
-    kpi: 'Document Rework Rate',
-    targetImpact: '35.0% -> 8.0% (-77% reduction)'
-  },
-  {
-    problemId: 'P-02',
-    problem: 'Extended Turnaround Time (5.0 Business Days)',
-    rootCause: 'Undifferentiated FIFO manual underwriting queue.',
-    brId: 'BR-01, BR-05',
-    frId: 'FR-13, FR-14, FR-15',
-    usId: 'US-09, US-10',
-    solution: 'Credit Decision Engine & Tier 1 STP Auto-Approval',
-    kpi: 'Average End-to-End TAT',
-    targetImpact: '5.0 Days -> 1.8 Days (-64% reduction)'
-  },
-  {
-    problemId: 'P-03',
-    problem: 'Duplicate Data Entry across 4 Systems (11.5% errors)',
-    rootCause: 'Siloed legacy architecture without API middleware bus.',
-    brId: 'BR-06, BR-01',
-    frId: 'FR-08, FR-05, FR-19',
-    usId: 'US-06, US-07',
-    solution: 'Unified RESTful API Microservices Orchestrator',
-    kpi: 'Manual System Touchpoints',
-    targetImpact: '12 steps -> 4 steps (-66% reduction)'
-  },
-  {
-    problemId: 'P-04',
-    problem: 'High Customer Inquiries (3.2 calls / loan)',
-    rootCause: 'Opaque black-box wait; zero progress updates.',
-    brId: 'BR-04, BR-09',
-    frId: 'FR-20, FR-07',
-    usId: 'US-03, US-04',
-    solution: '24/7 Self-Service Milestone Hub & Event Push Alerts',
-    kpi: 'Status Inquiries per Loan',
-    targetImpact: '3.2 calls -> 0.6 calls (-81% reduction)'
-  },
-  {
-    problemId: 'P-05',
-    problem: 'Frequent SLA Breaches (14% of volume)',
-    rootCause: 'Reactive tracking; lack of pre-breach threshold alerts.',
-    brId: 'BR-07, BR-01',
-    frId: 'FR-20, FR-15',
-    usId: 'US-14, US-11',
-    solution: 'Proactive SLA Countdown Engine (50% & 75% Alerts)',
-    kpi: 'SLA Breach Rate',
-    targetImpact: '14.0% -> 4.0% (-71% reduction)'
-  },
-  {
-    problemId: 'P-06',
-    problem: 'Manual KYC & AML Verification Bottleneck',
-    rootCause: 'Manual copy-pasting into external government portals.',
-    brId: 'BR-08, BR-01',
-    frId: 'FR-09, FR-10',
-    usId: 'US-08',
-    solution: 'Direct National ID & Real-Time AML API Screening',
-    kpi: 'KYC Cycle Time',
-    targetImpact: '4.0h -> <5 min (-98% for clean files)'
-  },
-  {
-    problemId: 'P-07',
-    problem: 'Paper Contract Signing & Disbursement Delay',
-    rootCause: 'Physical branch wet-ink signing mandates.',
-    brId: 'BR-10, BR-08',
-    frId: 'FR-17, FR-18, FR-19',
-    usId: 'US-04, US-13',
-    solution: 'Mobile OTP e-Signature & Core Banking Payment Rails',
-    kpi: 'Post-Approval Disbursement Latency',
-    targetImpact: '24.0h -> <15 min (-99% acceleration)'
-  }
-];
-
-export const KPI_ITEMS: KPIItem[] = [
-  {
-    id: 'KPI-01',
-    category: 'Operational',
-    name: 'Average End-to-End TAT',
-    formula: 'Avg hours from intake submission to disbursement',
-    baseline: '5.0 Business Days (40.0h)',
-    target: '1.8 Business Days (14.4h)',
-    change: '-64%',
-    trend: 'positive',
-    rationale: 'Directly drives customer conversion and competitive parity.'
-  },
-  {
-    id: 'KPI-02',
-    category: 'Quality',
-    name: 'Document Rework Rate',
-    formula: '(Applications requiring re-upload / Total apps) * 100',
-    baseline: '35.0% (3,500 apps/mo)',
-    target: '8.0% (800 apps/mo)',
-    change: '-77%',
-    trend: 'positive',
-    rationale: 'Eliminates the largest single source of operational delay.'
-  },
-  {
-    id: 'KPI-03',
-    category: 'Quality',
-    name: 'First-Time-Right (FTR) Rate',
-    formula: '(Applications processed with zero rework / Total apps) * 100',
-    baseline: '48.0%',
-    target: '82.0%',
-    change: '+71%',
-    trend: 'positive',
-    rationale: 'Measures front-end data and document intake precision.'
-  },
-  {
-    id: 'KPI-04',
-    category: 'Operational',
-    name: 'SLA Breach Rate',
-    formula: '(Applications exceeding 5-day SLA / Total apps) * 100',
-    baseline: '14.0% (1,400 apps/mo)',
-    target: '4.0% (400 apps/mo)',
-    change: '-71%',
-    trend: 'positive',
-    rationale: 'Guarantees service commitment and operational discipline.'
-  },
-  {
-    id: 'KPI-05',
-    category: 'Operational',
-    name: 'Straight-Through Processing %',
-    formula: '(Loans approved with zero human touch / Total apps) * 100',
-    baseline: '0.0%',
-    target: '38.0% (Tier 1 Low Risk)',
-    change: '+38% STP',
-    trend: 'positive',
-    rationale: 'Frees up underwriter capacity for complex files.'
-  },
-  {
-    id: 'KPI-06',
-    category: 'Customer',
-    name: 'Inbound Status Inquiries',
-    formula: 'Total status calls & emails / Total applications',
-    baseline: '3.2 calls / loan',
-    target: '0.6 calls / loan',
-    change: '-81%',
-    trend: 'positive',
-    rationale: 'Relieves branch staff from routine inquiry handling.'
-  },
-  {
-    id: 'KPI-07',
-    category: 'Customer',
-    name: 'Application Drop-Off Rate',
-    formula: '(Abandoned applications / Total intake starts) * 100',
-    baseline: '22.0%',
-    target: '9.0%',
-    change: '-59%',
-    trend: 'positive',
-    rationale: 'Recovers lost customer acquisitions during intake.'
-  },
-  {
-    id: 'KPI-08',
-    category: 'Customer',
-    name: 'Customer CSAT Score',
-    formula: '% positive ratings (4 & 5 stars) post-disbursement',
-    baseline: '61.0%',
-    target: '88.0%',
-    change: '+44%',
-    trend: 'positive',
-    rationale: 'Restores borrower trust and net promoter sentiment.'
+    rule: 'Loan funds shall remain locked until cryptographic e-Sign is verified, direct debit mandate is active, and destination account name matches applicant ID exactly.',
+    enforcement: 'Core Banking API disbursement endpoint rejected if preconditions return FALSE.'
   }
 ];
 
@@ -1102,17 +1050,18 @@ export const USER_STORIES_DATA: UserStory[] = [
     id: 'US-01',
     persona: 'Sarah',
     role: 'Retail Loan Applicant',
-    story: 'As a loan applicant, I want to see a clear, dynamic checklist of required documents tailored to my employment profile, so that I can upload the exact right files the first time and avoid delays.',
+    story: 'As a loan applicant, I want to see a dynamic, personalized document checklist based on my employment type, so that I only upload the exact documents required and avoid submission errors.',
     priority: 'Must Have',
     relatedFR: 'FR-02',
     acceptanceCriteria: [
       {
         scenario: 'Salaried applicant views checklist',
-        given: 'An applicant selects "Salaried Employee" on the initial form',
-        when: 'The applicant navigates to the Document Upload screen',
+        given: 'An applicant selects "Salaried Employee" in the digital intake portal',
+        when: 'The applicant navigates to the Document Upload step',
         then: [
-          'The system displays mandatory items: Photo ID, Last 3 Months Salary Slips, Last 6 Months Bank Statement, Proof of Address',
-          'The "Submit" button is disabled until all mandatory categories contain valid uploads'
+          'The system displays mandatory items: Photo ID, Last 3 Months Salary Slips, Last 6 Months Bank Statement',
+          'The system hides Self-Employed tax return upload fields',
+          'The "Submit" button remains disabled until all mandatory items have valid uploads'
         ]
       }
     ]
@@ -1121,96 +1070,18 @@ export const USER_STORIES_DATA: UserStory[] = [
     id: 'US-02',
     persona: 'Sarah',
     role: 'Retail Loan Applicant',
-    story: 'As a loan applicant, I want immediate feedback if my uploaded document is blurry, corrupt, or low-resolution, so that I can rectify the issue instantly before final submission.',
+    story: 'As a loan applicant, I want instant feedback if my uploaded document is blurry, cropped, or unreadable, so that I can rectify it immediately during submission rather than waiting days for a rejection email.',
     priority: 'Must Have',
     relatedFR: 'FR-04',
     acceptanceCriteria: [
       {
-        scenario: 'Low-resolution document rejected at upload',
+        scenario: 'Low-resolution image rejected at upload',
         given: 'An applicant is on the document upload screen',
-        when: 'The applicant uploads an image below 200 DPI resolution',
+        when: 'The applicant uploads a camera photo with resolution below 200 DPI',
         then: [
-          'The system rejects the file immediately prior to storage',
-          'Displays inline alert: "Document is blurry. Please upload a clear scan (minimum 300 DPI)"',
-          'Checklist status remains "Pending Upload"'
-        ]
-      }
-    ]
-  },
-  {
-    id: 'US-03',
-    persona: 'Sarah',
-    role: 'Retail Loan Applicant',
-    story: 'As a loan applicant, I want to track the real-time milestone status of my loan application online or on mobile, so that I know exactly which stage it is in without needing to call the branch.',
-    priority: 'Must Have',
-    relatedFR: 'FR-20',
-    acceptanceCriteria: [
-      {
-        scenario: 'Applicant views 5-stage milestone stepper',
-        given: 'An active applicant logs into the tracking portal',
-        when: 'The applicant views the Loan Tracker dashboard',
-        then: [
-          'The system displays a 5-stage stepper (Intake, KYC, Underwriting, Sanction/e-Sign, Disbursement)',
-          'Displays active stage progress and estimated completion date based on SLA'
-        ]
-      }
-    ]
-  },
-  {
-    id: 'US-04',
-    persona: 'Sarah',
-    role: 'Retail Loan Applicant',
-    story: 'As a loan applicant, I want to review my sanction letter and digitally sign my loan agreement using mobile OTP e-Signature, so that I can finalize my loan without printing or visiting a branch.',
-    priority: 'Must Have',
-    relatedFR: 'FR-17',
-    acceptanceCriteria: [
-      {
-        scenario: 'Applicant signs agreement via mobile OTP',
-        given: 'A loan application is approved with active sanction token',
-        when: 'The applicant reviews the agreement and enters the 6-digit SMS OTP',
-        then: [
-          'The system stamps the contract with a cryptographic digital signature and timestamp',
-          'Application state updates to AGREEMENT_EXECUTED',
-          'Disbursement Queue is automatically unlocked'
-        ]
-      }
-    ]
-  },
-  {
-    id: 'US-05',
-    persona: 'David',
-    role: 'Relationship Manager',
-    story: 'As a Relationship Manager, I want an instant pre-eligibility estimator on my tablet when meeting prospects, so that I can quote realistic loan amounts and interest rates upfront.',
-    priority: 'Should Have',
-    relatedFR: 'FR-01',
-    acceptanceCriteria: [
-      {
-        scenario: 'RM calculates instant eligibility quote',
-        given: 'RM inputs prospect monthly income $5,000 and existing debt $800',
-        when: 'RM clicks "Estimate Eligibility"',
-        then: [
-          'System calculates max allowable loan amount at 50% DTI ceiling',
-          'Displays indicative monthly installment and interest rate tier within 1.0 second'
-        ]
-      }
-    ]
-  },
-  {
-    id: 'US-08',
-    persona: 'Elena',
-    role: 'KYC / Compliance Analyst',
-    story: 'As a Compliance Officer, I want automated real-time verification against national ID registries and AML/PEP watchlists, so that standard clean profiles are verified instantly and I only review true compliance flags.',
-    priority: 'Must Have',
-    relatedFR: 'FR-09, FR-10',
-    acceptanceCriteria: [
-      {
-        scenario: 'Automated KYC returns clean match',
-        given: 'Application has passed document pre-validation',
-        when: 'System transmits ID data to National Registry API and AML screening',
-        then: [
-          'System verifies identity authenticity in < 3.0s',
-          'Confirms zero hits against PEP / sanctions databases',
-          'Transitions application state directly to KYC_VERIFIED'
+          'The system rejects the file immediately prior to server transmission',
+          'Displays inline warning: "Document resolution is too low. Please upload a clear scan (minimum 300 DPI)"',
+          'Prompts applicant to re-upload before proceeding'
         ]
       }
     ]
@@ -1219,7 +1090,7 @@ export const USER_STORIES_DATA: UserStory[] = [
     id: 'US-10',
     persona: 'Victor',
     role: 'Senior Underwriter',
-    story: 'As an Underwriter, I want qualified low-risk Tier 1 applications to be auto-approved via Straight-Through Processing (STP), so that my work queue is reserved for complex files and policy exception reviews.',
+    story: 'As an Underwriter, I want qualified low-risk Tier 1 applications to be auto-approved via Straight-Through Processing (STP), so that my queue is reserved for complex files and policy exception reviews.',
     priority: 'Must Have',
     relatedFR: 'FR-14',
     acceptanceCriteria: [
@@ -1257,38 +1128,339 @@ export const USER_STORIES_DATA: UserStory[] = [
   }
 ];
 
+// ---------------------------------------------------------
+// 10-Step Interactive Traceability Chains (Problem → KPI)
+// ---------------------------------------------------------
+export const TRACEABILITY_CHAINS: TraceabilityChain[] = [
+  {
+    id: 'TR-01',
+    title: 'Chain 1: Document Rework Elimination',
+    problem: 'P-01: 35% of all applications generate rework loops due to blurry or incomplete document uploads.',
+    rootCause: 'Intake decoupled from validation; generic static document checklist without point-of-upload pre-checks.',
+    gap: 'GAP-01: Absence of client-side resolution and completeness pre-validation.',
+    brId: 'BR-03',
+    brTitle: 'Point-of-Ingestion Pre-Validation',
+    frId: 'FR-04',
+    frTitle: 'Client-Side DPI & Completeness Pre-Validation',
+    usId: 'US-02',
+    usPersona: 'Retail Loan Applicant (Sarah)',
+    acceptanceCriteria: 'Given low-res upload (<200 DPI), When submitted, Then reject immediately with inline prompt.',
+    solution: 'Deploy client-side pre-validation (DPI ≥ 300) and context-sensitive dynamic checklists.',
+    kpi: 'Document Rework Rate',
+    targetImpact: 'Slashed from 35.0% to 8.0% (-77% rework reduction)'
+  },
+  {
+    id: 'TR-02',
+    title: 'Chain 2: Turnaround Time (TAT) Acceleration',
+    problem: 'P-02: 5.0 business days average processing turnaround time creates applicant drop-off.',
+    rootCause: '100% manual review in an undifferentiated FIFO underwriting queue with 9.5 hours idle wait.',
+    gap: 'GAP-05: Absence of automated Straight-Through Processing (STP) rules for low-risk files.',
+    brId: 'BR-05',
+    brTitle: 'Automated Straight-Through Processing (STP)',
+    frId: 'FR-14',
+    frTitle: 'Credit Decision Engine & Tier 1 STP Auto-Approval',
+    usId: 'US-10',
+    usPersona: 'Senior Underwriter (Victor)',
+    acceptanceCriteria: 'Given Score ≥750 & DTI ≤35%, When decisioned, Then auto-sanction in <10s with zero human touch.',
+    solution: 'Credit Decisioning Engine executing 38% automated Straight-Through Processing (STP).',
+    kpi: 'Average End-to-End TAT',
+    targetImpact: 'Reduced from 5.0 to 1.8 Business Days (-64% cycle time)'
+  },
+  {
+    id: 'TR-03',
+    title: 'Chain 3: System Handoff & Data Transcription',
+    problem: 'P-03: 4 disconnected legacy platforms require manual copy-pasting, causing 11.5% errors.',
+    rootCause: 'Siloed legacy databases lacking a centralized RESTful API enterprise integration bus.',
+    gap: 'GAP-03: Duplicate data entry across CRM, LOS, Credit Bureau, and Core Banking.',
+    brId: 'BR-06',
+    brTitle: 'Enterprise RESTful Data Synchronization',
+    frId: 'FR-08',
+    frTitle: 'Enterprise API Gateway & Real-Time Sync',
+    usId: 'US-06',
+    usPersona: 'Branch Operations Officer (David)',
+    acceptanceCriteria: 'Given applicant record update in CRM, When saved, Then sync to LOS and Core in <1.0s.',
+    solution: 'Centralized RESTful API microservices gateway synchronizing all banking systems.',
+    kpi: 'Manual System Touchpoints & Error Rate',
+    targetImpact: 'Touchpoints reduced from 12 to 4 (-66%); zero transcription errors'
+  },
+  {
+    id: 'TR-04',
+    title: 'Chain 4: Customer Status Transparency',
+    problem: 'P-04: High customer anxiety resulting in 3.2 inbound status inquiry calls per loan (32,000 calls/mo).',
+    rootCause: 'Opaque black-box wait times with zero automated progress updates between intake and decision.',
+    gap: 'GAP-06: Absence of customer self-service status portal and event notification triggers.',
+    brId: 'BR-04',
+    brTitle: 'Real-Time Milestone Tracking & Notifications',
+    frId: 'FR-20',
+    frTitle: '24/7 Customer Milestone Hub & Push Alerts',
+    usId: 'US-03',
+    usPersona: 'Retail Loan Applicant (Sarah)',
+    acceptanceCriteria: 'Given state transition to UNDERWRITING, When event fires, Then dispatch SMS alert with tracking link.',
+    solution: '24/7 Self-Service Milestone Tracking Portal with automated SMS/Email event triggers.',
+    kpi: 'Inbound Status Inquiry Calls',
+    targetImpact: 'Declines from 3.2 to 0.6 calls per loan (-81% branch call load)'
+  },
+  {
+    id: 'TR-05',
+    title: 'Chain 5: Operational SLA Governance',
+    problem: 'P-05: 14.0% SLA breach rate due to reactive queue tracking and lack of early warning alerts.',
+    rootCause: 'Lack of automated queue countdown monitors and pre-breach threshold triggers.',
+    gap: 'GAP-10: Absence of real-time SLA countdown engine and automated lead escalations.',
+    brId: 'BR-07',
+    brTitle: 'Proactive SLA Monitoring & Governance',
+    frId: 'FR-20',
+    frTitle: 'Real-Time SLA Monitor & Escalation Daemon',
+    usId: 'US-14',
+    usPersona: 'Operations Manager (Karen)',
+    acceptanceCriteria: 'Given queue time reaches 75% of limit, When evaluated, Then alert Team Lead and elevate priority.',
+    solution: 'Proactive SLA countdown daemon triggering warnings at 50% and 75% thresholds.',
+    kpi: 'SLA Breach Rate',
+    targetImpact: 'SLA violations reduced from 14.0% to 4.0% (-71% breach reduction)'
+  }
+];
+
+// ---------------------------------------------------------
+// Comprehensive KPI Framework & Measurement Sources
+// ---------------------------------------------------------
+export const KPI_FRAMEWORK_DATA: KPIItem[] = [
+  {
+    id: 'KPI-01',
+    category: 'Operational',
+    name: 'Average Loan Turnaround Time (TAT)',
+    definition: 'Total elapsed business hours from initial application submission to fund disbursement.',
+    formula: 'Σ (Timestamp_Disbursed - Timestamp_Submitted) / Total Disbursed Loans',
+    baseline: '5.0 Days (40.0h)',
+    target: '1.8 Days (14.4h)',
+    change: '-64% Cycle Time',
+    proposedSource: 'Loan Origination System (LOS) Event Timestamps',
+    owner: 'Head of Lending Operations',
+    frequency: 'Daily & Monthly Scorecard',
+    trend: 'positive',
+    rationale: 'Core operational velocity metric measuring origination throughput.'
+  },
+  {
+    id: 'KPI-02',
+    category: 'Quality',
+    name: 'Document Rework Rate',
+    definition: 'Percentage of total submitted applications requiring secondary document upload requests.',
+    formula: '(Applications with ≥1 Document Rejection / Total Applications Submitted) * 100',
+    baseline: '35.0% (3,500 apps)',
+    target: '8.0% (800 apps)',
+    change: '-77% Rework Volume',
+    proposedSource: 'Document Management System (DMS) Deficiency Logs',
+    owner: 'Central Operations Lead',
+    frequency: 'Weekly Quality Review',
+    trend: 'positive',
+    rationale: 'Primary indicator of intake data quality and process friction.'
+  },
+  {
+    id: 'KPI-03',
+    category: 'Quality',
+    name: 'First-Time-Right (FTR) Intake Rate',
+    definition: 'Percentage of applications progressing through intake and verification without any correction loops.',
+    formula: '(Applications Approved Without Rework / Total Applications Processed) * 100',
+    baseline: '48.0%',
+    target: '82.0%',
+    change: '+71% Quality Improvement',
+    proposedSource: 'Workflow Audit Trail & Deficiency Logs',
+    owner: 'Branch Operations Lead',
+    frequency: 'Monthly Scorecard',
+    trend: 'positive',
+    rationale: 'Reflects effectiveness of dynamic checklists and pre-validation.'
+  },
+  {
+    id: 'KPI-04',
+    category: 'Operational',
+    name: 'Straight-Through Processing (STP) Rate',
+    definition: 'Percentage of approved personal loans sanctioned and disbursed with zero manual underwriter touch.',
+    formula: '(Automated STP Approved Loans / Total Approved Loans) * 100',
+    baseline: '0.0% (100% Manual)',
+    target: '38.0% (Tier 1 Low-Risk)',
+    change: '+38% Automation Ratio',
+    proposedSource: 'Credit Decision Engine (CDE) Execution Logs',
+    owner: 'Head of Credit Risk',
+    frequency: 'Monthly Governance',
+    trend: 'positive',
+    rationale: 'Measures decision automation for pristine credit profiles.'
+  },
+  {
+    id: 'KPI-05',
+    category: 'Operational',
+    name: 'SLA Breach Rate (> 5 Business Days)',
+    definition: 'Percentage of total applications exceeding established stage and end-to-end SLA limits.',
+    formula: '(Applications Exceeding Stage SLA / Total Processed Applications) * 100',
+    baseline: '14.0% (1,400 loans)',
+    target: '4.0% (400 loans)',
+    change: '-71% SLA Breaches',
+    proposedSource: 'Workflow SLA Countdown Daemon',
+    owner: 'Operations Governance Lead',
+    frequency: 'Daily Live Monitor',
+    trend: 'positive',
+    rationale: 'Operational governance metric ensuring consistent delivery standards.'
+  },
+  {
+    id: 'KPI-06',
+    category: 'Customer',
+    name: 'Inbound Status Inquiry Calls',
+    definition: 'Average number of customer status check telephone calls and branch inquiries per application.',
+    formula: 'Total Inbound Loan Status Contacts / Total Active Applications',
+    baseline: '3.2 Calls / Loan',
+    target: '0.6 Calls / Loan',
+    change: '-81% Call Volume',
+    proposedSource: 'Contact Center CRM & Branch Ticketing System',
+    owner: 'Customer Experience Lead',
+    frequency: 'Monthly Customer Metric',
+    trend: 'positive',
+    rationale: 'Direct proxy for customer anxiety and process transparency.'
+  },
+  {
+    id: 'KPI-07',
+    category: 'Customer',
+    name: 'Customer Satisfaction (CSAT) Score',
+    definition: 'Percentage of applicants rating their loan origination experience as 4 or 5 out of 5 stars.',
+    formula: '(Positive Survey Responses (4 & 5 Stars) / Total Survey Responses) * 100',
+    baseline: '61.0%',
+    target: '88.0%',
+    change: '+44% Satisfaction',
+    proposedSource: 'Post-Disbursement Automated Digital Survey',
+    owner: 'Head of Retail Banking',
+    frequency: 'Monthly Executive Scorecard',
+    trend: 'positive',
+    rationale: 'Holistic measure of customer sentiment and brand loyalty.'
+  }
+];
+
+// Alias for backward compatibility
+export const KPI_ITEMS = KPI_FRAMEWORK_DATA;
+
+// ---------------------------------------------------------
+// 3-Phase Implementation Roadmap
+// ---------------------------------------------------------
+export const ROADMAP_3_PHASES: RoadmapPhase[] = [
+  {
+    phaseNumber: 'Phase 1',
+    title: 'Process Standardization & Operational Governance',
+    duration: 'Months 1–3',
+    focus: 'Foundation & Rules Codification',
+    objectives: [
+      'Eliminate policy ambiguity across all 45 retail branch networks',
+      'Codify standardized document matrices and Delegated Lending Authority limits',
+      'Establish departmental operating level agreement (OLA) contracts'
+    ],
+    keyDeliverables: [
+      'Standardized Document Requirement Matrix across all retail branches',
+      'Formalized Departmental Operating SLA Contracts with automated triggers',
+      'Codified Delegated Lending Authority (DLA) approval limits matrix',
+      'Standardized Fair Lending adverse action reason code catalog'
+    ],
+    dependencies: [
+      'Credit Risk & Compliance policy alignment sign-off',
+      'Branch operations executive committee mandate'
+    ],
+    successMeasures: [
+      '100% branch compliance on document intake checklists',
+      'Formal sign-off on credit decision policy rules'
+    ]
+  },
+  {
+    phaseNumber: 'Phase 2',
+    title: 'Workflow & Validation Automation',
+    duration: 'Months 3–6',
+    focus: 'Intake Modernization & Core Integrations',
+    objectives: [
+      'Deploy responsive digital intake portal with client-side pre-validation',
+      'Integrate real-time REST APIs for National ID registry and credit bureau ingestion',
+      'Launch automated customer milestone tracking hub and SMS/Email push alerts'
+    ],
+    keyDeliverables: [
+      'Responsive Web & Mobile Application Capture Portal with DPI ≥ 300 checks',
+      'RESTful API Connectors to National Identity Registry and AML watchlists',
+      'Credit Bureau API connector & Algorithmic DTI computation engine',
+      'Customer 24/7 Self-Service Milestone Tracker'
+    ],
+    dependencies: [
+      'Phase 1 standardized business rules and data models',
+      'API Gateway security infrastructure & external vendor contracts'
+    ],
+    successMeasures: [
+      'Document rework rate drops from 35% to < 18% in pilot branches',
+      'Bureau ingestion completes in < 3.0 seconds'
+    ]
+  },
+  {
+    phaseNumber: 'Phase 3',
+    title: 'Optimization & Continuous Monitoring',
+    duration: 'Months 6–12',
+    focus: 'Decision Engine, STP & Full Scale Rollout',
+    objectives: [
+      'Activate automated Straight-Through Processing (STP) for Tier 1 low-risk loans',
+      'Deploy Unified Underwriter Exception Workbench and mobile OTP e-Signature',
+      'Automate Core Banking API payment release and proactive SLA monitors'
+    ],
+    keyDeliverables: [
+      'Credit Decision Engine executing 38% automated STP approvals',
+      'Unified Underwriter Decision Workbench with risk highlight cards',
+      'Mobile OTP cryptographic digital e-Signature service',
+      'Real-time Core Banking API disbursement trigger (<15 min release)',
+      'Operations Dashboard with proactive 75% SLA countdown alerts'
+    ],
+    dependencies: [
+      'Phase 2 API integrations and data validation stability',
+      'Underwriting staff simulation training and change enablement'
+    ],
+    successMeasures: [
+      'Steady-state Turnaround Time (TAT) reaches 1.8 Business Days (-64%)',
+      '38% STP volume achieved with zero manual touch',
+      'SLA breach rate falls to ≤ 4.0%'
+    ]
+  }
+];
+
+// Alias for backward compatibility
+export const ROADMAP_PHASES = ROADMAP_3_PHASES.map(p => ({
+  phase: p.phaseNumber,
+  name: p.title,
+  duration: p.duration,
+  status: p.focus,
+  deliverables: p.keyDeliverables,
+  gate: p.successMeasures[0]
+}));
+
+// ---------------------------------------------------------
+// 5x5 Risk Register
+// ---------------------------------------------------------
 export const RISKS_DATA: RiskItem[] = [
   {
     id: 'RSK-01',
-    title: 'Legacy Core Banking Integration Delays',
-    category: 'Technology / Arch',
+    title: 'Legacy Core Banking API Integration Delays',
+    category: 'Technology / Architecture',
     prob: 4,
     imp: 4,
     score: 16,
     severity: 'High',
-    mitigation: 'Deploy containerized API Gateway / ESB wrapper; perform early interface mock testing.',
-    owner: 'Lead IT Architect'
+    mitigation: 'Deploy containerized API Gateway / ESB wrapper; perform early interface contract mocking and load tests.',
+    owner: 'Lead Enterprise IT Architect'
   },
   {
     id: 'RSK-02',
-    title: 'OCR Data Extraction Inaccuracy',
-    category: 'Technology / Data',
+    title: 'OCR Data Extraction & Resolution Inaccuracy',
+    category: 'Technology / Data Quality',
     prob: 3,
     imp: 4,
     score: 12,
     severity: 'High',
-    mitigation: 'Enforce client-side DPI validation (≥300 DPI); route extractions with <85% confidence to human review.',
+    mitigation: 'Enforce client-side DPI validation (≥300 DPI); route OCR extractions with <85% confidence to human review.',
     owner: 'Lead Business Analyst'
   },
   {
     id: 'RSK-03',
-    title: 'Staff Workflow Adoption & Resistance',
-    category: 'People / Org',
+    title: 'Staff Workflow Adoption & Change Resistance',
+    category: 'People / Organization',
     prob: 4,
     imp: 3,
     score: 12,
     severity: 'High',
-    mitigation: 'Appoint Branch Digital Champions; execute role-based simulation training; align branch KPIs to digital adoption.',
+    mitigation: 'Appoint Branch Digital Champions in all 45 branches; execute role-based simulation training; tie branch KPIs to digital adoption.',
     owner: 'Head of Change Management'
   },
   {
@@ -1299,7 +1471,7 @@ export const RISKS_DATA: RiskItem[] = [
     imp: 5,
     score: 10,
     severity: 'High',
-    mitigation: 'Set conservative Tier 1 STP rules (Score ≥750, DTI ≤35%); monthly Credit Committee back-testing.',
+    mitigation: 'Set conservative Tier 1 STP criteria (Score ≥750, DTI ≤35%); perform monthly Credit Committee back-testing.',
     owner: 'Head of Credit Risk'
   },
   {
@@ -1310,7 +1482,7 @@ export const RISKS_DATA: RiskItem[] = [
     imp: 3,
     score: 9,
     severity: 'Medium',
-    mitigation: 'Build asynchronous queue retry handlers with automatic failover to secondary bureau providers.',
+    mitigation: 'Build asynchronous queue retry handlers with automatic failover to secondary certified bureau/registry providers.',
     owner: 'IT Infrastructure Lead'
   },
   {
@@ -1321,13 +1493,13 @@ export const RISKS_DATA: RiskItem[] = [
     imp: 3,
     score: 9,
     severity: 'Medium',
-    mitigation: 'Provide assisted digital branch onboarding where branch officers guide walk-ins on branch tablets.',
+    mitigation: 'Provide assisted digital onboarding where branch officers guide walk-ins on branch tablets.',
     owner: 'Head of Retail Branches'
   },
   {
     id: 'RSK-07',
     title: 'Data Privacy & PII Leakage Risk',
-    category: 'InfoSec',
+    category: 'Information Security',
     prob: 1,
     imp: 5,
     score: 5,
@@ -1338,67 +1510,12 @@ export const RISKS_DATA: RiskItem[] = [
   {
     id: 'RSK-08',
     title: 'Fair Lending & Algorithmic Bias Risk',
-    category: 'Regulatory',
+    category: 'Regulatory Compliance',
     prob: 1,
     imp: 5,
     score: 5,
     severity: 'Medium',
     mitigation: 'Quarterly independent algorithmic fairness audits; decision parameters strictly evaluate financial capacity only.',
     owner: 'Chief Compliance Officer'
-  }
-];
-
-export const ROADMAP_PHASES = [
-  {
-    phase: 'Phase 1',
-    name: 'Process Standardization & Governance',
-    duration: 'Months 1–3',
-    status: 'Foundation',
-    deliverables: [
-      'Standardized Document Requirement Matrix across all 45 retail branches',
-      'Formalized Departmental Operating SLA Contracts',
-      'Codified Delegated Lending Authority (DLA) approval limits',
-      'Standardized Fair Lending adverse action reason codes'
-    ],
-    gate: 'Credit Risk & Compliance sign-off on standardized business rules'
-  },
-  {
-    phase: 'Phase 2',
-    name: 'Digital Enablement & Intake Modernization',
-    duration: 'Months 3–6',
-    status: 'Core Intake',
-    deliverables: [
-      'Responsive web & mobile Digital Application Portal',
-      'Automated Document Pre-Validation Engine (DPI ≥ 300)',
-      'Customer Self-Service Milestone Tracker & notification triggers',
-      'Branch document barcode indexing tool'
-    ],
-    gate: 'Pilot launch in 5 high-volume branches; document rework drops to < 20%'
-  },
-  {
-    phase: 'Phase 3',
-    name: 'Workflow Automation & STP Decisioning',
-    duration: 'Months 6–9',
-    status: 'Decision Engine',
-    deliverables: [
-      'Automated REST API connectors for National ID Registry & AML Watchlists',
-      'Credit Rating Bureau API integration & algorithmic DTI calculator',
-      'Credit Decisioning Engine executing automated STP for low-risk Tier 1',
-      'Unified Underwriter Decision Workbench and mobile OTP e-Signature'
-    ],
-    gate: 'First 500 Straight-Through-Processed (STP) loans executed with zero touch'
-  },
-  {
-    phase: 'Phase 4',
-    name: 'Continuous Optimization & Real-Time Analytics',
-    duration: 'Months 9–12',
-    status: 'Enterprise Scale',
-    deliverables: [
-      'Real-time Operations Dashboard with queue depth & bottleneck monitors',
-      'Proactive SLA countdown timers triggering alerts at 50% & 75% thresholds',
-      'Automated Core Banking API disbursement trigger (<15 min funds release)',
-      'Post-disbursement customer satisfaction survey automation'
-    ],
-    gate: 'Full rollout across all 45 branches; achievement of steady-state 1.8-day TAT'
   }
 ];

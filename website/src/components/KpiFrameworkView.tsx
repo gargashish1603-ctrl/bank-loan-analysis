@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { BarChart3, Sliders } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
-import { KPI_ITEMS } from '../data/baData';
+import { KPI_FRAMEWORK_DATA } from '../data/baData';
 
-export const KpiDashboardSimulator: React.FC = () => {
-  // Scenario Simulator State (Illustrative modeling)
+export const KpiFrameworkView: React.FC = () => {
+  // Scenario Simulator State
   const [monthlyVolume, setMonthlyVolume] = useState<number>(10000);
   const [stpRate, setStpRate] = useState<number>(38);
   const [reworkReduction, setReworkReduction] = useState<number>(77);
@@ -27,11 +27,10 @@ export const KpiDashboardSimulator: React.FC = () => {
     }
   };
 
-  // Derived Scenario Metrics
+  // Derived Metrics
   const baselineReworkFiles = Math.round(monthlyVolume * 0.35);
   const projectedReworkFiles = Math.round(monthlyVolume * (0.35 * (1 - reworkReduction / 100)));
   const reworkSaved = baselineReworkFiles - projectedReworkFiles;
-
   const projectedStpLoans = Math.round(monthlyVolume * (stpRate / 100));
   const hoursSavedPerMonth = Math.round(monthlyVolume * (40.0 - 14.4));
 
@@ -42,56 +41,80 @@ export const KpiDashboardSimulator: React.FC = () => {
     { name: 'FTR Rate (%)', Baseline: 48.0, Target: 82.0 },
     { name: 'SLA Breach (%)', Baseline: 14.0, Target: 4.0 },
     { name: 'Status Calls', Baseline: 3.2, Target: 0.6 },
-    { name: 'CSAT Score (%)', Baseline: 61.0, Target: 88.0 },
+    { name: 'CSAT (%)', Baseline: 61.0, Target: 88.0 },
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-        <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">
+    <section id="kpi-framework" className="space-y-8">
+      {/* Section Header */}
+      <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
           <BarChart3 className="w-4 h-4" />
-          <span>Operational Analytics & Performance</span>
+          <span>Measurement Framework</span>
         </div>
-        <h2 className="text-2xl font-bold text-slate-900">KPI Measurement Framework & Scenario Simulator</h2>
-        <p className="mt-2 text-sm text-slate-600">
-          Multi-dimensional lending scorecard measuring operational velocity, submission quality, and borrower customer satisfaction.
-        </p>
-      </div>
-
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-        {KPI_ITEMS.map((kpi) => (
-          <div key={kpi.id} className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{kpi.category}</span>
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                  kpi.trend === 'positive' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
-                }`}>
-                  {kpi.change}
-                </span>
-              </div>
-              <h3 className="font-bold text-slate-900 text-xs mb-2">{kpi.name}</h3>
-              <div className="space-y-1 my-2 p-2 rounded bg-slate-50 border border-slate-100">
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-500">Baseline:</span>
-                  <span className="font-bold text-slate-700">{kpi.baseline}</span>
-                </div>
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-500">TO-BE Target:</span>
-                  <span className="font-bold text-emerald-600">{kpi.target}</span>
-                </div>
-              </div>
-            </div>
-            <p className="text-[10px] text-slate-400 mt-2">{kpi.rationale}</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              KPI Governance Framework & Scenario Simulator
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-4xl leading-relaxed">
+              Multi-dimensional lending scorecard measuring operational velocity, submission quality, governance compliance, and borrower sentiment.
+            </p>
           </div>
-        ))}
+          <div className="shrink-0">
+            <span className="text-[10px] text-slate-500 bg-slate-100 px-2.5 py-1 rounded border border-slate-200 font-medium block">
+              Proposed measurement sources for portfolio case study
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Recharts Visual Comparison */}
+      {/* Comprehensive KPI Table */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-4 bg-slate-900 text-white flex items-center justify-between text-xs font-bold uppercase tracking-wider">
+          <span>Balanced Lending Scorecard & Mathematical Formulas</span>
+          <span className="text-slate-400 font-normal">7 Multi-Dimensional KPIs</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px] uppercase">
+                <th className="p-3">KPI Name & Category</th>
+                <th className="p-3">Definition & Mathematical Formula</th>
+                <th className="p-3">Baseline</th>
+                <th className="p-3">Target</th>
+                <th className="p-3">Proposed Data Source</th>
+                <th className="p-3">Governance Owner</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {KPI_FRAMEWORK_DATA.map((kpi) => (
+                <tr key={kpi.id} className="hover:bg-slate-50/70 transition-colors">
+                  <td className="p-3 font-bold text-slate-900">
+                    <span className="text-[10px] text-blue-600 block uppercase">{kpi.category}</span>
+                    {kpi.name}
+                  </td>
+                  <td className="p-3 text-slate-600 max-w-xs">
+                    <span className="text-slate-800 font-medium block mb-1">{kpi.definition}</span>
+                    <code className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono block">
+                      {kpi.formula}
+                    </code>
+                  </td>
+                  <td className="p-3 font-bold text-red-600">{kpi.baseline}</td>
+                  <td className="p-3 font-bold text-emerald-600">{kpi.target}</td>
+                  <td className="p-3 text-slate-600 text-[11px]">{kpi.proposedSource}</td>
+                  <td className="p-3 text-slate-600 text-[11px]">{kpi.owner}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Visual Chart Comparison */}
       <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-4">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 mb-4">
           Baseline (AS-IS) vs. Target (TO-BE) Visual Benchmark
         </h3>
         <div className="h-72 w-full">
@@ -113,7 +136,7 @@ export const KpiDashboardSimulator: React.FC = () => {
       </div>
 
       {/* Interactive Scenario Simulator */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 rounded-xl p-6 text-white border border-slate-800 shadow-xl space-y-6">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 rounded-xl p-6 sm:p-8 text-white border border-slate-800 shadow-xl space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-blue-400" />
@@ -126,7 +149,7 @@ export const KpiDashboardSimulator: React.FC = () => {
             <button
               onClick={() => applyPreset('baseline')}
               className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                activePreset === 'baseline' ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                activePreset === 'baseline' ? 'bg-red-600 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
               Baseline AS-IS
@@ -134,7 +157,7 @@ export const KpiDashboardSimulator: React.FC = () => {
             <button
               onClick={() => applyPreset('target')}
               className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                activePreset === 'target' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                activePreset === 'target' ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
               Target 2026 Plan
@@ -142,7 +165,7 @@ export const KpiDashboardSimulator: React.FC = () => {
             <button
               onClick={() => applyPreset('aggressive')}
               className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
-                activePreset === 'aggressive' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                activePreset === 'aggressive' ? 'bg-blue-600 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
               Scale Stress-Test
@@ -265,6 +288,6 @@ export const KpiDashboardSimulator: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

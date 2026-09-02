@@ -1,219 +1,240 @@
 import React, { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { FileCode } from 'lucide-react';
 import {
   BUSINESS_REQUIREMENTS,
   FUNCTIONAL_REQUIREMENTS,
+  NON_FUNCTIONAL_REQUIREMENTS,
+  BUSINESS_RULES,
   USER_STORIES_DATA
 } from '../data/baData';
 import type { Requirement } from '../data/baData';
 
 export const RequirementsHub: React.FC = () => {
-  const [reqTab, setReqTab] = useState<'br' | 'fr' | 'nfr' | 'stories'>('br');
+  const [activeTab, setActiveTab] = useState<'BR' | 'FR' | 'NFR' | 'RULES' | 'STORIES'>('BR');
+  const [selectedReq, setSelectedReq] = useState<Requirement | null>(BUSINESS_REQUIREMENTS[0]);
 
-  const nfrData: Requirement[] = [
-    {
-      id: 'NFR-01',
-      category: 'Security & Access Control',
-      title: 'Role-Based Access Control (RBAC) & AES-256 Encryption',
-      description: 'The system shall enforce RBAC and MFA for all bank staff. Sensitive applicant PII shall be encrypted using AES-256 at rest and TLS 1.3 in transit.',
-      rationale: 'Zero unauthorized access and statutory customer data security.',
-      priority: 'Must Have',
-      relatedProblem: 'P-06'
-    },
-    {
-      id: 'NFR-02',
-      category: 'System Performance',
-      title: 'Sub-3-Second API Latency',
-      description: 'The system shall execute external API calls (National ID, Credit Bureau, AML Watchlist) within 3.0s (95th percentile) and page load < 1.5s.',
-      rationale: 'High throughput preventing system bottlenecking.',
-      priority: 'Must Have',
-      relatedProblem: 'P-02'
-    },
-    {
-      id: 'NFR-03',
-      category: 'Availability',
-      title: '99.9% Production Uptime',
-      description: 'The digital customer intake portal and workflow engine shall maintain 99.9% availability during operating hours (24/7 digital intake).',
-      rationale: 'Uninterrupted customer onboarding.',
-      priority: 'Must Have',
-      relatedProblem: 'P-04'
-    },
-    {
-      id: 'NFR-04',
-      category: 'Auditability',
-      title: 'Immutable 7-Year Audit Trail',
-      description: 'The system shall maintain an immutable audit log recording every system action, credit pull, underwriter comment, and approval override for 7 years.',
-      rationale: '100% regulatory examination compliance.',
-      priority: 'Must Have',
-      relatedProblem: 'P-06'
-    }
+  const tabs = [
+    { id: 'BR', label: 'Business Reqs (BR)', count: BUSINESS_REQUIREMENTS.length },
+    { id: 'FR', label: 'Functional Reqs (FR)', count: FUNCTIONAL_REQUIREMENTS.length },
+    { id: 'NFR', label: 'Non-Functional (NFR)', count: NON_FUNCTIONAL_REQUIREMENTS.length },
+    { id: 'RULES', label: 'Banking Business Rules', count: BUSINESS_RULES.length },
+    { id: 'STORIES', label: 'User Stories & Gherkin', count: USER_STORIES_DATA.length }
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Navigation Header */}
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">
-            <FileText className="w-4 h-4" />
-            <span>Requirements Engineering</span>
+    <section id="requirements" className="space-y-8">
+      {/* Section Header */}
+      <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
+          <FileCode className="w-4 h-4" />
+          <span>Requirements Engineering</span>
+        </div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Requirements Specification & Business Rules Hub
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-4xl leading-relaxed">
+              Complete catalog of Business Requirements (BR), Functional Requirements (FR), Non-Functional Requirements (NFR), codified Banking Business Rules, and testable Gherkin User Stories.
+            </p>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">Requirements Specification & User Stories</h2>
-          <p className="text-xs text-slate-600 mt-1">
-            Complete business, functional, and non-functional specifications alongside persona-driven user stories.
-          </p>
         </div>
 
-        {/* Tab Controls */}
-        <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 shrink-0 text-xs font-bold">
-          <button
-            onClick={() => setReqTab('br')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              reqTab === 'br' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Business Reqs ({BUSINESS_REQUIREMENTS.length})
-          </button>
-          <button
-            onClick={() => setReqTab('fr')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              reqTab === 'fr' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Functional Reqs ({FUNCTIONAL_REQUIREMENTS.length})
-          </button>
-          <button
-            onClick={() => setReqTab('nfr')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              reqTab === 'nfr' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Non-Functional ({nfrData.length})
-          </button>
-          <button
-            onClick={() => setReqTab('stories')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              reqTab === 'stories' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            User Stories (Gherkin)
-          </button>
+        {/* Requirements Tab Navigation */}
+        <div className="mt-6 flex space-x-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-100 text-xs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id as any);
+                if (tab.id === 'BR') setSelectedReq(BUSINESS_REQUIREMENTS[0]);
+                if (tab.id === 'FR') setSelectedReq(FUNCTIONAL_REQUIREMENTS[0]);
+                if (tab.id === 'NFR') setSelectedReq(NON_FUNCTIONAL_REQUIREMENTS[0]);
+              }}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
+                activeTab === tab.id
+                  ? 'bg-blue-600 text-white shadow-xs font-bold'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold ${
+                activeTab === tab.id ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-700'
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Business Requirements View */}
-      {reqTab === 'br' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          {BUSINESS_REQUIREMENTS.map((br) => (
-            <div key={br.id} className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+      {/* Tab Content Display */}
+      {/* 1. BR / FR / NFR View */}
+      {(activeTab === 'BR' || activeTab === 'FR' || activeTab === 'NFR') && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Requirements List */}
+          <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-700">
+              <span>{activeTab} Specifications</span>
+              <span className="text-[11px] text-slate-400 font-normal">Click to view details</span>
+            </div>
+
+            <div className="divide-y divide-slate-100 overflow-y-auto max-h-[440px]">
+              {(activeTab === 'BR'
+                ? BUSINESS_REQUIREMENTS
+                : activeTab === 'FR'
+                ? FUNCTIONAL_REQUIREMENTS
+                : NON_FUNCTIONAL_REQUIREMENTS
+              ).map((req) => {
+                const isSelected = selectedReq?.id === req.id;
+                return (
+                  <div
+                    key={req.id}
+                    onClick={() => setSelectedReq(req)}
+                    className={`p-3.5 text-xs transition-colors cursor-pointer flex items-center justify-between ${
+                      isSelected ? 'bg-blue-50/90 border-l-4 border-blue-600' : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-blue-600">{req.id}</span>
+                        <span className="font-bold text-slate-900">{req.title}</span>
+                      </div>
+                      <span className="text-slate-500 text-[11px] block mt-0.5">{req.category}</span>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                        {req.priority}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Requirement Detail Drawer */}
+          {selectedReq && (
+            <div className="lg:col-span-5 bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold text-[10px] border border-blue-200">
-                    {br.id} • {br.category}
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-red-100 text-red-800 font-bold text-[10px]">{br.priority}</span>
-                </div>
-                <h3 className="font-bold text-slate-900 text-sm mb-2">{br.title}</h3>
-                <p className="text-slate-700 leading-relaxed mb-3">{br.description}</p>
-              </div>
-              <div className="p-2.5 rounded bg-slate-50 border border-slate-100">
-                <span className="font-bold text-slate-700 block text-[10px] uppercase">Business Rationale:</span>
-                <span className="text-slate-600 text-[11px]">{br.rationale}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Functional Requirements View */}
-      {reqTab === 'fr' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-          {FUNCTIONAL_REQUIREMENTS.map((fr) => (
-            <div key={fr.id} className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px] border border-emerald-200">
-                    {fr.id} • {fr.category}
-                  </span>
-                  <span className="text-slate-400 font-medium text-[10px]">{fr.priority}</span>
-                </div>
-                <h3 className="font-bold text-slate-900 text-xs mb-1.5">{fr.title}</h3>
-                <p className="text-slate-600 text-[11px] leading-relaxed mb-3">{fr.description}</p>
-              </div>
-              <div className="p-2 rounded bg-slate-50 border border-slate-100 text-[10px] text-slate-500">
-                Rationale: <strong className="text-slate-700">{fr.rationale}</strong>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Non-Functional Requirements View */}
-      {reqTab === 'nfr' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          {nfrData.map((nfr) => (
-            <div key={nfr.id} className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-bold text-[10px] border border-purple-200">
-                  {nfr.id} • {nfr.category}
-                </span>
-                <span className="px-2 py-0.5 rounded bg-red-100 text-red-800 font-bold text-[10px]">{nfr.priority}</span>
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-2">{nfr.title}</h3>
-              <p className="text-slate-700 leading-relaxed mb-3">{nfr.description}</p>
-              <div className="p-2.5 rounded bg-purple-50/60 border border-purple-100 text-[11px] text-purple-950 font-medium">
-                Standard / Target: {nfr.rationale}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* User Stories with Given-When-Then Acceptance Criteria */}
-      {reqTab === 'stories' && (
-        <div className="space-y-4">
-          {USER_STORIES_DATA.map((us) => (
-            <div key={us.id} className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-4 text-xs">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
-                    {us.id.replace('US-', '')}
-                  </span>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div>
-                    <h3 className="font-bold text-slate-900 text-sm">{us.persona} ({us.role})</h3>
-                    <span className="text-[11px] text-slate-500">Related Requirement: <strong>{us.relatedFR}</strong></span>
+                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{selectedReq.id}</span>
+                    <h3 className="text-lg font-bold text-slate-900 leading-tight">{selectedReq.title}</h3>
+                    <span className="text-xs text-slate-500">{selectedReq.category}</span>
                   </div>
+                  <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                    {selectedReq.priority}
+                  </span>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-blue-50 text-blue-800 font-bold text-[10px] border border-blue-200">
-                  {us.priority}
-                </span>
-              </div>
 
-              {/* User Story Box */}
-              <div className="p-3.5 rounded-lg bg-blue-50/60 border border-blue-100 text-slate-900 text-xs leading-relaxed font-medium">
-                "{us.story}"
-              </div>
-
-              {/* Acceptance Criteria */}
-              <div className="space-y-2">
-                <span className="font-bold text-slate-700 uppercase tracking-wider text-[10px] block">
-                  Acceptance Criteria (Gherkin Given / When / Then):
-                </span>
-                {us.acceptanceCriteria.map((ac, idx) => (
-                  <div key={idx} className="p-3.5 rounded-lg bg-slate-900 text-slate-200 font-mono text-[11px] space-y-1">
-                    <div className="text-amber-400 font-bold">Scenario: {ac.scenario}</div>
-                    <div className="text-slate-300"><span className="text-sky-400 font-bold">Given</span> {ac.given}</div>
-                    <div className="text-slate-300"><span className="text-yellow-400 font-bold">When</span> {ac.when}</div>
-                    {ac.then.map((t, tidx) => (
-                      <div key={tidx} className="text-emerald-400"><span className="text-emerald-300 font-bold">Then</span> {t}</div>
-                    ))}
+                <div className="space-y-3 mt-4 text-xs">
+                  <div>
+                    <span className="font-bold text-slate-700 block mb-1">Requirement Specification:</span>
+                    <p className="text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed font-medium">
+                      {selectedReq.description}
+                    </p>
                   </div>
-                ))}
+
+                  <div>
+                    <span className="font-bold text-slate-700 block mb-1">Business Rationale:</span>
+                    <p className="text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">
+                      {selectedReq.rationale}
+                    </p>
+                  </div>
+
+                  {selectedReq.businessValue && (
+                    <div>
+                      <span className="font-bold text-emerald-700 block mb-1">Projected Business Value:</span>
+                      <p className="text-slate-700 bg-emerald-50/60 p-3 rounded-lg border border-emerald-100 leading-relaxed">
+                        {selectedReq.businessValue}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
+                <span>Source Problem: <strong className="text-slate-800">{selectedReq.relatedProblem}</strong></span>
+                {selectedReq.relatedProcessStep && (
+                  <span>Stage: <strong className="text-slate-800">{selectedReq.relatedProcessStep}</strong></span>
+                )}
               </div>
             </div>
-          ))}
+          )}
         </div>
       )}
-    </div>
+
+      {/* 2. Banking Business Rules View */}
+      {activeTab === 'RULES' && (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800">
+              12 Codified Banking Business Rules & Policy Thresholds
+            </h3>
+            <span className="text-xs text-slate-500">Enforced across STP & Underwriting Desks</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            {BUSINESS_RULES.map((rule) => (
+              <div key={rule.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-blue-600 text-[11px]">{rule.id}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800">
+                      {rule.category}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-xs text-slate-900 mb-1.5">{rule.name}</h4>
+                  <p className="text-slate-700 leading-relaxed bg-white p-2.5 rounded border border-slate-200/80 mb-2 font-medium">
+                    {rule.rule}
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-200 text-[10px] text-slate-600">
+                  <span className="font-bold text-slate-700">Enforcement:</span> {rule.enforcement}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 3. User Stories & Gherkin Acceptance Criteria View */}
+      {activeTab === 'STORIES' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800">
+                Persona-Driven User Stories & Testable Gherkin Criteria
+              </h3>
+              <span className="text-xs text-slate-500">Behavior-Driven Development (BDD) Format</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {USER_STORIES_DATA.map((us) => (
+                <div key={us.id} className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-blue-600 text-xs">{us.id} • {us.persona}</span>
+                    <span className="text-[10px] text-slate-500 font-semibold">{us.role}</span>
+                  </div>
+
+                  <p className="text-slate-800 font-medium leading-relaxed bg-white p-3 rounded-lg border border-slate-200">
+                    "{us.story}"
+                  </p>
+
+                  <div className="p-3 rounded-lg bg-slate-900 text-white space-y-1.5 font-mono text-[11px]">
+                    <div className="text-blue-400 font-bold">Scenario: {us.acceptanceCriteria[0]?.scenario}</div>
+                    <div className="text-slate-300"><span className="text-amber-400 font-bold">GIVEN</span> {us.acceptanceCriteria[0]?.given}</div>
+                    <div className="text-slate-300"><span className="text-sky-400 font-bold">WHEN</span> {us.acceptanceCriteria[0]?.when}</div>
+                    <div className="text-slate-300"><span className="text-emerald-400 font-bold">THEN</span> {us.acceptanceCriteria[0]?.then.join('; ')}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
   );
 };

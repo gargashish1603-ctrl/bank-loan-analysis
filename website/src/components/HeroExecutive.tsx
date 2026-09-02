@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, RefreshCw, CheckCircle, ShieldAlert, ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowDown, Clock, RefreshCw, ShieldAlert, Sparkles } from 'lucide-react';
 
 interface HeroExecutiveProps {
   onExploreClick: () => void;
@@ -7,142 +7,135 @@ interface HeroExecutiveProps {
 
 export const HeroExecutive: React.FC<HeroExecutiveProps> = ({ onExploreClick }) => {
   return (
-    <section className="bg-gradient-to-b from-slate-900 via-slate-850 to-slate-900 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Badges */}
+    <section id="executive-summary" className="bg-gradient-to-b from-slate-900 via-slate-850 to-slate-900 text-white py-14 px-4 sm:px-6 lg:px-8 border-b border-slate-800 relative overflow-hidden">
+      {/* Subtle Background Geometric Glow */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Eyebrow & Badges */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className="px-2.5 py-1 rounded text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            Retail Banking Case Study
+          <span className="px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-blue-500/15 text-blue-400 border border-blue-500/30">
+            BANKING PROCESS TRANSFORMATION
           </span>
-          <span className="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            Process Optimization & Requirements Engineering
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+            Business Analyst Case Study
           </span>
-          <span className="px-2.5 py-1 rounded text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+          <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700 hidden sm:inline">
             NovaBank — Fictional Enterprise Bank
           </span>
         </div>
 
-        {/* Hero Title */}
+        {/* Main Heading & Subtitle */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-8">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-              Banking Loan Origination <br className="hidden sm:block" />
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              Redesigning the Personal Loan <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-emerald-400">
-                Process Optimization
+                Origination Journey
               </span>
             </h1>
-            <p className="mt-2 text-lg text-slate-300 font-medium">
-              AS-IS Process Analysis, Gap Assessment & TO-BE Process Design
-            </p>
-            <p className="mt-4 text-sm text-slate-400 max-w-3xl leading-relaxed">
-              A comprehensive Business Analyst engagement addressing acute cycle-time delays, high document rework, and system fragmentation in NovaBank's unsecured personal lending operations.
+
+            <p className="mt-4 text-base sm:text-lg text-slate-300 font-medium leading-relaxed max-w-3xl">
+              A Business Analyst case study analyzing the AS-IS loan origination process, identifying operational bottlenecks and root causes, and designing an automation-first TO-BE process.
             </p>
 
-            {/* 60-Second Recruiter Pitch */}
+            {/* Core BA Problem & Scope Synthesis */}
             <div className="mt-6 p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 shadow-lg">
-              <div className="flex items-center gap-2 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">
                 <Sparkles className="w-4 h-4 text-blue-400" />
-                <span>60-Second Executive Summary</span>
+                <span>Executive Case Synthesis</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-2.5 rounded bg-slate-900/60 border border-slate-700/40">
-                  <span className="text-slate-400 block font-medium">1. Business Problem</span>
-                  <span className="text-slate-200 mt-1 block">5.0-day turnaround, 35% document rework, 14% SLA breaches across 10k apps/month.</span>
-                </div>
-                <div className="p-2.5 rounded bg-slate-900/60 border border-slate-700/40">
-                  <span className="text-slate-400 block font-medium">2. Root Cause Diagnosed</span>
-                  <span className="text-slate-200 mt-1 block">Unassisted document intake, 4 disconnected legacy systems, undifferentiated FIFO queues.</span>
-                </div>
-                <div className="p-2.5 rounded bg-slate-900/60 border border-slate-700/40">
-                  <span className="text-slate-400 block font-medium">3. Recommended TO-BE</span>
-                  <span className="text-slate-200 mt-1 block">Automation-first STP for low-risk files + Exception Underwriter Workbench + Dynamic intake.</span>
-                </div>
-                <div className="p-2.5 rounded bg-slate-900/60 border border-slate-700/40">
-                  <span className="text-slate-400 block font-medium">4. Expected Impact</span>
-                  <span className="text-emerald-400 font-semibold mt-1 block">TAT: 1.8 Days (-64%), Rework: 8% (-77%), FTR: 82% (+71%).</span>
-                </div>
-              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                NovaBank personal loan processing required <strong className="text-white font-semibold">5.0 business days</strong> with <strong className="text-amber-300 font-semibold">35% document rework</strong> and <strong className="text-red-300 font-semibold">14% SLA breaches</strong> across 10,000 monthly applications. Through root-cause diagnostics, this project re-architected the journey into a dual-track operating model: <strong className="text-emerald-400 font-semibold">38% Straight-Through Processing (STP)</strong> for low-risk applicants and an <strong className="text-sky-300 font-semibold">Exception Underwriter Workbench</strong> for complex reviews.
+              </p>
             </div>
 
             {/* Quick Actions */}
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 onClick={onExploreClick}
-                className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs flex items-center gap-2 shadow-sm transition-all"
+                className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center gap-2 shadow transition-all"
               >
-                <span>Explore Full BA Engagement</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Explore Full Case Study</span>
+                <ArrowDown className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                onClick={() => {
+                  const el = document.getElementById('as-is-process');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition-colors"
+              >
+                Inspect AS-IS BPMN Map
               </button>
             </div>
           </div>
 
-          {/* Quick Metrics Scorecard */}
-          <div className="lg:col-span-4 bg-slate-800/90 border border-slate-700 rounded-2xl p-5 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Baseline vs. Target KPI Impact</span>
-              <span className="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">Illustrative Modeling</span>
+          {/* 3 Prominent Baseline KPI Cards */}
+          <div className="lg:col-span-4 space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Baseline Performance</span>
+              <span className="text-[10px] text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">Monthly: 10,000 Apps</span>
             </div>
 
-            <div className="space-y-3.5">
-              {/* Metric 1 */}
-              <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-700/60 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">Average Loan TAT</span>
-                    <span className="text-sm font-bold text-slate-100">5.0 Days <span className="text-slate-500">→</span> <span className="text-emerald-400 font-bold">1.8 Days</span></span>
-                  </div>
+            {/* Card 1: Turnaround Time */}
+            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-500/15 text-blue-400">
+                  <Clock className="w-5 h-5" />
                 </div>
-                <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 text-xs font-bold">-64%</span>
+                <div>
+                  <div className="text-2xl font-extrabold text-white">5.0 days</div>
+                  <div className="text-[11px] text-slate-400 font-medium">Average Turnaround Time</div>
+                </div>
               </div>
-
-              {/* Metric 2 */}
-              <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-700/60 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
-                    <RefreshCw className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">Document Rework Rate</span>
-                    <span className="text-sm font-bold text-slate-100">35.0% <span className="text-slate-500">→</span> <span className="text-emerald-400 font-bold">8.0%</span></span>
-                  </div>
-                </div>
-                <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 text-xs font-bold">-77%</span>
-              </div>
-
-              {/* Metric 3 */}
-              <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-700/60 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                    <CheckCircle className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">First-Time-Right (FTR)</span>
-                    <span className="text-sm font-bold text-slate-100">48.0% <span className="text-slate-500">→</span> <span className="text-emerald-400 font-bold">82.0%</span></span>
-                  </div>
-                </div>
-                <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 text-xs font-bold">+71%</span>
-              </div>
-
-              {/* Metric 4 */}
-              <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-700/60 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
-                    <ShieldAlert className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">SLA Breach Rate</span>
-                    <span className="text-sm font-bold text-slate-100">14.0% <span className="text-slate-500">→</span> <span className="text-emerald-400 font-bold">4.0%</span></span>
-                  </div>
-                </div>
-                <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 text-xs font-bold">-71%</span>
+              <div className="text-right">
+                <span className="text-xs font-bold text-emerald-400 block">→ 1.8 days</span>
+                <span className="text-[10px] text-slate-400">-64% Target</span>
               </div>
             </div>
 
-            <div className="mt-3 text-[11px] text-slate-400 text-center">
-              Monthly Baseline: 10,000 Personal Loan Applications
+            {/* Card 2: Document Rework */}
+            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-amber-500/15 text-amber-400">
+                  <RefreshCw className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-2xl font-extrabold text-white">35%</div>
+                  <div className="text-[11px] text-slate-400 font-medium">Document Rework</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-bold text-emerald-400 block">→ 8%</span>
+                <span className="text-[10px] text-slate-400">-77% Target</span>
+              </div>
+            </div>
+
+            {/* Card 3: SLA Breach Rate */}
+            <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-red-500/15 text-red-400">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-2xl font-extrabold text-white">14%</div>
+                  <div className="text-[11px] text-slate-400 font-medium">SLA Breach Rate</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-bold text-emerald-400 block">→ 5%</span>
+                <span className="text-[10px] text-slate-400">-64% Target</span>
+              </div>
+            </div>
+
+            {/* Mandatory Illustrative Disclaimer */}
+            <div className="p-2 rounded-lg bg-slate-900/60 border border-slate-800 text-center">
+              <span className="text-[10px] text-amber-300/90 font-semibold tracking-wide uppercase">
+                ILLUSTRATIVE ASSUMPTIONS FOR PORTFOLIO CASE STUDY — NOT REAL BANK DATA
+              </span>
             </div>
           </div>
         </div>

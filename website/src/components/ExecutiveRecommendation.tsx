@@ -1,96 +1,97 @@
 import React from 'react';
-import { Award, TrendingUp, BookOpen } from 'lucide-react';
+import { Award, CheckCircle2, Sparkles, ArrowUpRight } from 'lucide-react';
 
 export const ExecutiveRecommendation: React.FC = () => {
-  const baCompetencies = [
-    { title: '1. Problem Scoping & Baseline', desc: 'Quantified baseline friction (10k volume, 5.0d TAT, 35% rework) with strict in/out of scope boundaries.' },
-    { title: '2. Stakeholder Governance', desc: 'Engaged 11 stakeholder groups with a 2x2 Power-Interest matrix and tailored communication plans.' },
-    { title: '3. BPMN Process Modeling', desc: 'Constructed 8-swimlane AS-IS vs TO-BE process models detailing idle queue dwell times.' },
-    { title: '4. Root-Cause Diagnostics', desc: 'Conducted multi-tier 5 Whys and 6M Ishikawa Fishbone analyses to pinpoint structural failure points.' },
-    { title: '5. Operational Gap Analysis', desc: 'Built a 12-point Gap Matrix evaluating current vs future state with MoSCoW prioritization.' },
-    { title: '6. Requirements Engineering', desc: 'Authored 10 Business Reqs, 20 Functional Reqs, 8 Non-Functional Reqs, and 12 Banking Business Rules.' },
-    { title: '7. Agile User Stories & Gherkin', desc: 'Created 15 persona-driven User Stories with testable Given/When/Then Acceptance Criteria.' },
-    { title: '8. Requirements Traceability (RTM)', desc: 'Maintained unbroken bi-directional linkage: Problem → Root Cause → BR → FR → US → Solution → KPI.' },
-    { title: '9. KPI Scorecard & Modeling', desc: 'Formulated operational, quality, and customer metrics with mathematical definitions and target baselines.' },
-    { title: '10. Risk & Change Management', desc: 'Formulated the ADKAR change transition framework, 5x5 Risk Register, and 4-Phase Phased Roadmap.' },
+  const pillars = [
+    {
+      num: '01',
+      title: 'STANDARDIZE',
+      subtitle: 'Rules & Intake Governance',
+      desc: 'Codify document checklists across all 45 retail branches, standardize intake matrices, and enforce client-side pre-validation (DPI ≥ 300) to stop defective files at ingestion.'
+    },
+    {
+      num: '02',
+      title: 'AUTOMATE',
+      subtitle: 'STP Decisioning & APIs',
+      desc: 'Deploy automated REST API connectors for National ID, AML, and Credit Bureaus, enabling 38% instant Straight-Through Processing (STP) auto-approvals in <10 seconds.'
+    },
+    {
+      num: '03',
+      title: 'MONITOR',
+      subtitle: 'Proactive Governance & SLAs',
+      desc: 'Implement real-time SLA countdown timers with automated pre-breach threshold escalations and an Exception Underwriter Workbench for complex credit files.'
+    }
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Executive Strategic Recommendation Card */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 rounded-2xl p-8 text-white border border-slate-800 shadow-xl space-y-6">
-        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-          <Award className="w-5 h-5 text-emerald-400" />
-          <span>Strategic Executive Recommendation</span>
+    <section id="recommendation" className="space-y-8">
+      {/* Section Header */}
+      <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
+          <Award className="w-4 h-4" />
+          <span>Executive Synthesis</span>
         </div>
-
-        <h2 className="text-2xl sm:text-3xl font-bold text-white leading-snug">
-          Transforming NovaBank Personal Lending into an Automation-First, Exception-Based Operating Model
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Recommendation
         </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
-          <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700">
-            <span className="text-slate-400 block font-semibold mb-1">1. Strategic Diagnosis</span>
-            <p className="text-slate-300 leading-relaxed">
-              Origination delays are not driven by under-staffing, but by decoupled document validation, 4 disconnected legacy systems, and an undifferentiated FIFO underwriting queue.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700">
-            <span className="text-slate-400 block font-semibold mb-1">2. Engineered Target State</span>
-            <p className="text-slate-300 leading-relaxed">
-              Deploy client-side pre-validation (DPI ≥ 300), API microservices sync, 38% Straight-Through-Processing (STP) for Tier 1 low risk, and a Unified Decision Workbench for licensed underwriters.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700">
-            <span className="text-slate-400 block font-semibold mb-1">3. Phased Execution</span>
-            <p className="text-slate-300 leading-relaxed">
-              Execute a progressive 4-Phase Roadmap (Standardize → Digitize → Automate → Optimize) over 12 months, avoiding big-bang risk and ensuring 100% compliance adherence.
-            </p>
-          </div>
-        </div>
-
-        {/* Expected Impact Banner */}
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="w-5 h-5 text-emerald-400 shrink-0" />
-            <div>
-              <span className="font-bold text-emerald-300 block">Projected Operational Impact:</span>
-              <span className="text-slate-300">TAT reduced from 5.0 to 1.8 Days (-64%), Rework slashed from 35% to 8% (-77%), and CSAT elevated to 88%.</span>
-            </div>
-          </div>
-          <span className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold shrink-0">
-            High-Impact ROI
-          </span>
-        </div>
+        <p className="mt-2 text-base sm:text-lg text-slate-700 font-semibold leading-relaxed max-w-4xl">
+          NovaBank should move from a manually coordinated loan origination process toward an automation-first, exception-based operating model.
+        </p>
       </div>
 
-      {/* Core Business Analyst Competencies Demonstrated */}
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-6">
-        <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 uppercase tracking-wider">
-          <BookOpen className="w-4 h-4" />
-          <span>Professional Portfolio Competencies</span>
+      {/* 3 Core Transformation Pillars */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {pillars.map((p) => (
+          <div
+            key={p.num}
+            className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-all"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-3xl font-extrabold text-blue-600 font-mono">{p.num}</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                  Strategic Pillar
+                </span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">{p.title}</h3>
+              <span className="text-xs font-semibold text-slate-500 block mb-2">{p.subtitle}</span>
+              <p className="text-xs text-slate-600 leading-relaxed">{p.desc}</p>
+            </div>
+
+            <div className="mt-6 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Core BA Transformation Lever</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Final Memorable Consulting Takeaway */}
+      <div className="p-8 sm:p-10 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 text-white border border-slate-800 shadow-xl text-center space-y-4">
+        <div className="w-12 h-12 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center mx-auto text-blue-400">
+          <Sparkles className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900">Key Business Analysis Competencies Demonstrated</h3>
-        <p className="text-xs text-slate-600">
-          This case study exemplifies end-to-end consulting rigor and industry-standard Business Analysis techniques.
+
+        <blockquote className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white max-w-3xl mx-auto leading-snug">
+          "The objective is not to remove human judgment — it is to reserve human judgment for the cases where it creates the most value."
+        </blockquote>
+
+        <p className="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed">
+          By eliminating 32.6 hours of administrative queue latency and codifying risk policies, NovaBank achieves a 64% TAT reduction while elevating portfolio compliance.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          {baCompetencies.map((comp, idx) => (
-            <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center shrink-0 text-[11px]">
-                ✓
-              </span>
-              <div>
-                <h4 className="font-bold text-slate-900 text-xs mb-0.5">{comp.title}</h4>
-                <p className="text-slate-600 text-[11px] leading-relaxed">{comp.desc}</p>
-              </div>
-            </div>
-          ))}
+        <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-xs">
+          <a
+            href="https://github.com/gargashish1603-ctrl/bank-loan-analysis"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors flex items-center gap-2"
+          >
+            <span>View Full Specification on GitHub</span>
+            <ArrowUpRight className="w-4 h-4" />
+          </a>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

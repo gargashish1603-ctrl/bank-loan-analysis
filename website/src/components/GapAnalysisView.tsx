@@ -1,43 +1,42 @@
 import React, { useState } from 'react';
-import { Columns } from 'lucide-react';
+import { SplitSquareVertical } from 'lucide-react';
 import { GAP_ANALYSIS_DATA } from '../data/baData';
 
 export const GapAnalysisView: React.FC = () => {
-  const [selectedPriority, setSelectedPriority] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [priorityFilter, setPriorityFilter] = useState<string>('All');
 
-  const filteredGaps = GAP_ANALYSIS_DATA.filter((gap) => {
-    const matchesPriority = selectedPriority === 'All' || gap.priority === selectedPriority;
-    const matchesSearch = gap.dimension.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          gap.gap.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          gap.improvement.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesPriority && matchesSearch;
-  });
+  const filteredGaps = priorityFilter === 'All'
+    ? GAP_ANALYSIS_DATA
+    : GAP_ANALYSIS_DATA.filter((g) => g.priority === priorityFilter);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-        <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">
-          <Columns className="w-4 h-4" />
-          <span>Operational Gap Assessment</span>
+    <section id="gap-analysis" className="space-y-8">
+      {/* Section Header */}
+      <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
+          <SplitSquareVertical className="w-4 h-4" />
+          <span>Capability Assessment</span>
         </div>
-        <h2 className="text-2xl font-bold text-slate-900">AS-IS vs. TO-BE Operational Gap Matrix</h2>
-        <p className="mt-2 text-sm text-slate-600">
-          Structured comparative evaluation of 12 critical operational gaps between current capabilities and future-state target operating model.
-        </p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Gap Analysis (AS-IS vs. Desired TO-BE State)
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-4xl leading-relaxed">
+              Scannable comparative matrix defining current operational baselines, diagnosed capability gaps, target desired states, and projected business value.
+            </p>
+          </div>
 
-        {/* Filter Toolbar */}
-        <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-100 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-slate-500 font-medium">Priority:</span>
+          {/* Priority Filter */}
+          <div className="flex items-center gap-2 shrink-0 text-xs">
+            <span className="text-slate-500 font-semibold">Priority:</span>
             {['All', 'Must Have', 'Should Have'].map((p) => (
               <button
                 key={p}
-                onClick={() => setSelectedPriority(p)}
-                className={`px-3 py-1 rounded-full font-medium transition-colors ${
-                  selectedPriority === p
-                    ? 'bg-blue-600 text-white'
+                onClick={() => setPriorityFilter(p)}
+                className={`px-3 py-1 rounded-full font-semibold transition-all ${
+                  priorityFilter === p
+                    ? 'bg-blue-600 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -45,57 +44,48 @@ export const GapAnalysisView: React.FC = () => {
               </button>
             ))}
           </div>
-
-          <div className="w-full sm:w-64">
-            <input
-              type="text"
-              placeholder="Search gaps or improvements..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
         </div>
       </div>
 
-      {/* Gap Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="bg-slate-100 border-b border-slate-200 text-slate-700">
-              <th className="p-3 font-bold w-20">ID</th>
-              <th className="p-3 font-bold w-36">Process Dimension</th>
-              <th className="p-3 font-bold text-red-700">AS-IS State</th>
-              <th className="p-3 font-bold">Identified Gap & Impact</th>
-              <th className="p-3 font-bold text-emerald-700">Proposed Improvement</th>
-              <th className="p-3 font-bold w-24">Priority</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 text-slate-700">
-            {filteredGaps.map((gap) => (
-              <tr key={gap.id} className="hover:bg-slate-50 transition-colors">
-                <td className="p-3 font-bold text-blue-600">{gap.id}</td>
-                <td className="p-3 font-semibold text-slate-900">{gap.dimension}</td>
-                <td className="p-3 bg-red-50/30 text-red-900">{gap.asIs}</td>
-                <td className="p-3">
-                  <span className="font-semibold text-slate-800 block">{gap.gap}</span>
-                  <span className="text-[11px] text-red-600 mt-0.5 block">{gap.impact}</span>
-                </td>
-                <td className="p-3 bg-emerald-50/30 text-emerald-950 font-medium">{gap.improvement}</td>
-                <td className="p-3">
-                  <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                    gap.priority === 'Must Have'
-                      ? 'bg-red-100 text-red-800 border border-red-200'
-                      : 'bg-amber-100 text-amber-800 border border-amber-200'
-                  }`}>
-                    {gap.priority}
-                  </span>
-                </td>
+      {/* Scannable 4-Column Table */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-900 text-white font-bold text-[11px] uppercase tracking-wider">
+                <th className="p-3.5 border-b border-slate-800">Operational Dimension</th>
+                <th className="p-3.5 border-b border-slate-800 bg-red-950/40 text-red-200">Current State (AS-IS)</th>
+                <th className="p-3.5 border-b border-slate-800 bg-amber-950/40 text-amber-200">Diagnosed Gap</th>
+                <th className="p-3.5 border-b border-slate-800 bg-emerald-950/40 text-emerald-200">Desired State (TO-BE)</th>
+                <th className="p-3.5 border-b border-slate-800">Business Impact</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredGaps.map((item) => (
+                <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="p-3.5 font-bold text-slate-900">
+                    <span className="text-[10px] text-blue-600 block uppercase tracking-wider">{item.id}</span>
+                    {item.dimension}
+                  </td>
+                  <td className="p-3.5 text-slate-700 bg-red-50/30 leading-relaxed font-medium">
+                    {item.asIs}
+                  </td>
+                  <td className="p-3.5 text-amber-900 bg-amber-50/30 leading-relaxed font-medium">
+                    {item.gap}
+                  </td>
+                  <td className="p-3.5 text-emerald-900 bg-emerald-50/30 leading-relaxed font-semibold">
+                    {item.toBe}
+                  </td>
+                  <td className="p-3.5 text-slate-600 leading-relaxed">
+                    <span className="text-slate-800 font-semibold block mb-0.5">{item.impact}</span>
+                    <span className="text-[10px] text-blue-600 font-medium">{item.improvement}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
